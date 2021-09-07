@@ -1,0 +1,38 @@
+version: "3.5"
+services:
+  x-app: &base-app
+    build:
+      context: .
+      target: app
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+      - ./deploy:/app/deploy
+    environment: &base-app-env
+      SECRET_KEY: "insecure"
+      DEBUG: "true"
+#    entrypoint: /app/deploy/wait-for-it.sh database:5432 --
+
+  dev:
+    <<: *base-app
+    build:
+      context: .
+      target: dev
+    command: python manage.py runserver_plus --print-sql 0.0.0.0:8000
+
+  app:
+    <<: *base-app
+    build:
+      context: .
+      target: app
+    image: docker-registry.secure.amsterdam.nl/datapunt/verkeersvergunningen:${VERSION:-latest}
+    command: /app/deploy/docker-run.sh
+
+  test:
+    <<: *base-app
+    build:
+      context: .
+      target: tests
+    environment:
+      <<: *base-app-env
+      DJANGO_SETTINGS_MODULE: "main.settings"

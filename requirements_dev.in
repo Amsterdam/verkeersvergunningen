@@ -9,3 +9,7 @@
 pip-tools
 
 # Useful extra developer packages:
+werkzeug  # Needed for runserver_plus
+pytest
+pytest-cov
+pytest-django

@@ -54,7 +54,7 @@ dev: 						        ## Run the development app (and run extra migrations first)
 	$(run) --service-ports dev
 
 test:                               ## Execute tests
-	$(dc) run --rm test pytest /tests $(ARGS)
+	$(dc) run --rm test pytest /app/tests $(ARGS)
 
 parser_telcameras_v2:
 	$(dc) run parser_telcameras_v2

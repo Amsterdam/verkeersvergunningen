@@ -8,24 +8,67 @@ asgiref==3.4.1
     # via
     #   -r ./requirements.txt
     #   django
+attrs==21.2.0
+    # via pytest
+certifi==2021.5.30
+    # via
+    #   -r ./requirements.txt
+    #   sentry-sdk
 click==8.0.1
     # via pip-tools
+coverage==5.5
+    # via pytest-cov
 django==3.2.7
+    # via
+    #   -r ./requirements.txt
+    #   django-extensions
+django-extensions==3.1.3
     # via -r ./requirements.txt
+iniconfig==1.1.1
+    # via pytest
+packaging==21.0
+    # via pytest
 pep517==0.11.0
     # via pip-tools
 pip-tools==6.2.0
+    # via -r requirements_dev.in
+pluggy==1.0.0
+    # via pytest
+py==1.10.0
+    # via pytest
+pyparsing==2.4.7
+    # via packaging
+pytest==6.2.5
+    # via
+    #   -r requirements_dev.in
+    #   pytest-cov
+    #   pytest-django
+pytest-cov==2.12.1
+    # via -r requirements_dev.in
+pytest-django==4.4.0
     # via -r requirements_dev.in
 pytz==2021.1
     # via
     #   -r ./requirements.txt
     #   django
+sentry-sdk==1.3.1
+    # via -r ./requirements.txt
 sqlparse==0.4.1
     # via
     #   -r ./requirements.txt
     #   django
+toml==0.10.2
+    # via
+    #   pytest
+    #   pytest-cov
 tomli==1.2.1
     # via pep517
+urllib3==1.26.6
+    # via
+    #   -r ./requirements.txt
+    #   sentry-sdk
+werkzeug==2.0.1
+    # via -r requirements_dev.in
 wheel==0.37.0
     # via pip-tools
 

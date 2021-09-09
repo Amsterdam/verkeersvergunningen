@@ -95,6 +95,15 @@ class TestVerkeersvergunningen:
         )
         assert response.status_code == 502
 
+    def test_invalid_json(self, client):
+        response = client.post(
+            self.URL,
+            'invalid json',
+            content_type='application/json',
+            **self.auth_headers
+        )
+        assert response.status_code == 400
+
     def test_when_decos_is_not_available(self, client):
         # response = client.post(self.URL, json.dumps(self.test_payload), content_type='application/json')
         # assert response.status_code == 502

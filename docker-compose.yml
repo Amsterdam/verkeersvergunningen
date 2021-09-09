@@ -18,6 +18,10 @@ services:
     build:
       context: .
       target: dev
+    environment:
+      <<: *base-app-env
+      CLEOPATRA_BASIC_AUTH_USER: "insecure"
+      CLEOPATRA_BASIC_AUTH_PASS: "insecure"
     command: python manage.py runserver_plus --print-sql 0.0.0.0:8000
 
   app:
@@ -36,3 +40,5 @@ services:
     environment:
       <<: *base-app-env
       DJANGO_SETTINGS_MODULE: "main.settings"
+      CLEOPATRA_BASIC_AUTH_USER: "insecure"
+      CLEOPATRA_BASIC_AUTH_PASS: "insecure"

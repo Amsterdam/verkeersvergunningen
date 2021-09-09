@@ -4,3 +4,5 @@
 django
 sentry-sdk
 django_extensions
+django-basicauth
+requests

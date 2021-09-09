@@ -20,9 +20,16 @@ from sentry_sdk.integrations.django import DjangoIntegration
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
 
+DECOS_BASE_URL = os.getenv('DECOS_BASE_URL', 'https://decosdvl.acc.amsterdam.nl/decosweb/aspx/api/v1/items/')
+ZWAAR_VERKEER_ZAAKNUMMER = os.getenv('ZWAAR_VERKEER_ZAAKNUMMER', '8A02814D73B3421B9C65262A45A43BD8')
+DECOS_BASIC_AUTH_USER = os.getenv('DECOS_BASIC_AUTH_USER')
+DECOS_BASIC_AUTH_PASS = os.getenv('DECOS_BASIC_AUTH_PASS')
+CLEOPATRA_BASIC_AUTH_USER = os.environ['CLEOPATRA_BASIC_AUTH_USER']
+CLEOPATRA_BASIC_AUTH_PASS = os.environ['CLEOPATRA_BASIC_AUTH_PASS']
+BASICAUTH_USERS = {CLEOPATRA_BASIC_AUTH_USER: CLEOPATRA_BASIC_AUTH_PASS}
 
 ALLOWED_HOSTS = ['*']
 INTERNAL_IPS = ('127.0.0.1', '0.0.0.0')

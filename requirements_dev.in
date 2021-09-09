@@ -13,3 +13,4 @@ werkzeug  # Needed for runserver_plus
 pytest
 pytest-cov
 pytest-django
+pytest-mock

@@ -10,6 +10,8 @@ WORKDIR /app/src
 COPY src .
 
 ARG SECRET_KEY=not-used
+ARG CLEOPATRA_BASIC_AUTH_USER=not-used
+ARG CLEOPATRA_BASIC_AUTH_PASS=not-used
 RUN python manage.py collectstatic --no-input
 
 USER datapunt

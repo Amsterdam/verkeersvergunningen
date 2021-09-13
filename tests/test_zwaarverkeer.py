@@ -16,20 +16,11 @@ class MockResponse:
     def json(self):
         return self.json_content
 
-def http_auth(username, password):
-    """
-    Encode Basic Auth username:password.
-    :param username:
-    :param password:
-    :return String:
-    """
-    return auth_string
-
 
 class TestVerkeersvergunningen:
     def setup(self):
         self.URL = '/zwaarverkeer/has_permit/'
-        self.test_payload = {'number_plate': '1234AB'}
+        self.test_payload = {'number_plate': '1234AB', 'passage_at': '2022-01-01T13:00:00.000'}
 
         # Basic auth
         credentials = f"{settings.CLEOPATRA_BASIC_AUTH_USER}:{settings.CLEOPATRA_BASIC_AUTH_PASS}"

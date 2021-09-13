@@ -6,3 +6,4 @@ sentry-sdk
 django_extensions
 django-basicauth
 requests
+python-dateutil

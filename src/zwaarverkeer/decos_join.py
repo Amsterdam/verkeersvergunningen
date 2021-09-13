@@ -3,6 +3,7 @@ import os
 import requests
 from django.conf import settings
 from django.http import HttpResponse
+
 from zwaarverkeer.tools import ImmediateHttpResponse
 
 
@@ -16,23 +17,33 @@ class DecosJoin:
     def _build_url(self, *args):
         return os.path.join(self.base_url, settings.ZWAAR_VERKEER_ZAAKNUMMER, 'FOLDERS', *args)
 
-    def _get_filters(self, number_plate):
+    def _get_filters(self, number_plate, passage_at):
         # TEXT48 = number_plate
+        # TEXT17 = type ontheffing (jaarontheffing/dagontheffing/routeontheffing)
         # DFUNCTION = result
+        # DATE6 = date from
+        # DATE7 = date until
 
-        # TODO: also check for the date_from and the date_until of the vergunning
         filters = f"?filter=TEXT48 has '{number_plate}'" \
                   f" and PROCESSED eq 'J'" \
-                  f" and DFUNCTION eq 'Verleend'"
+                  f" and DFUNCTION eq 'Verleend'" \
+                  f" and DATE6 le '{passage_at.date().isoformat()}'" \
+                  f" and DATE7 ge '{passage_at.date().isoformat()}'"
         filters.replace(' ', '%20')
         return filters
 
     def _do_request(self, url):
         return requests.get(url, auth=(self.auth_user, self.auth_pass))
 
-    def has_permit(self, number_plate):
-        url = self._build_url(self._get_filters(number_plate))
+    def has_permit(self, number_plate, passage_at):
+        url = self._build_url(self._get_filters(number_plate, passage_at))
         response = self._do_request(url)
         if response.status_code != 200:
             raise ImmediateHttpResponse(response=HttpResponse("We got an error response from Decos Join", status=502))
-        return response.json()['count'] >= 1
+
+        if not response.json().get('count'):
+            return False
+
+        # TODO: get the "soort vergunning" (dagontheffing/jaarontheffing/routeontheffing)
+
+        return True

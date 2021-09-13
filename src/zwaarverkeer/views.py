@@ -2,11 +2,12 @@ import json
 import logging
 
 from basicauth.decorators import basic_auth_required
-from django.http import HttpResponseNotAllowed, JsonResponse
+from dateutil import parser
+from django.http import HttpResponse, HttpResponseNotAllowed, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+
 from zwaarverkeer.decos_join import DecosJoin
 from zwaarverkeer.tools import ImmediateHttpResponse
-from django.http import HttpResponse
 
 log = logging.getLogger(__name__)
 
@@ -18,10 +19,14 @@ def zwaar_verkeer(request):
         return HttpResponseNotAllowed(['POST'])
 
     try:
-        number_plate = json.loads(request.body.decode("utf-8"))['number_plate']
+        data = json.loads(request.body.decode("utf-8"))
+        number_plate = data['number_plate']
+        passage_at = parser.parse(data['passage_at'])  # naive local datetime?
+
         # TODO: check for number plate formatting (len and isalnum) and upper
+
         decos = DecosJoin()
-        has_permit = decos.has_permit(number_plate)
+        has_permit = decos.has_permit(number_plate, passage_at)
         return JsonResponse(
             {
                 'number_plate': number_plate,

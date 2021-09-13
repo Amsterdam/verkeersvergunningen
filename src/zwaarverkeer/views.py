@@ -1,39 +1,35 @@
-import json
 import logging
 
-from basicauth.decorators import basic_auth_required
+from braces.views import CsrfExemptMixin
 from dateutil import parser
-from django.http import HttpResponse, HttpResponseNotAllowed, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-
+from rest_framework import serializers
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from zwaarverkeer.authentication import BasicAuthWithKeys
 from zwaarverkeer.decos_join import DecosJoin
 from zwaarverkeer.tools import ImmediateHttpResponse
 
 log = logging.getLogger(__name__)
 
 
-@basic_auth_required
-@csrf_exempt
-def zwaar_verkeer(request):
-    if request.method != "POST":
-        return HttpResponseNotAllowed(['POST'])
+class HasPermitSerializer(serializers.Serializer):
+    number_plate = serializers.CharField(min_length=6, max_length=6)
+    passage_at = serializers.DateTimeField()
 
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-        number_plate = data['number_plate']
-        passage_at = parser.parse(data['passage_at'])  # naive local datetime?
 
-        # TODO: check for number plate formatting (len and isalnum) and upper
+class HasPermitView(CsrfExemptMixin, APIView):
+    http_method_names = ['post']
+    authentication_classes = [BasicAuthWithKeys]
+    serializer_classes = [HasPermitSerializer]
+    # renderer_classes =
 
-        decos = DecosJoin()
-        has_permit = decos.has_permit(number_plate, passage_at)
-        return JsonResponse(
-            {
-                'number_plate': number_plate,
-                'has_permit': has_permit
-            }
-        )
-    except ImmediateHttpResponse as e:
-        return e.response
-    except json.decoder.JSONDecodeError as e:
-        return HttpResponse("Invalid JSON", status=400)
+    def post(self, request):
+        number_plate = request.data['number_plate']
+        passage_at = parser.parse(request.data['passage_at'])  # naive local datetime?
+
+        try:
+            decos = DecosJoin()
+            has_permit = decos.has_permit(number_plate, passage_at)
+            return Response({'number_plate': request.data['number_plate'], 'has_permit': has_permit})
+        except ImmediateHttpResponse as e:
+            return e.response

@@ -7,3 +7,5 @@ django_extensions
 django-basicauth
 requests
 python-dateutil
+djangorestframework
+django-braces

@@ -63,7 +63,7 @@ class TestVerkeersvergunningen:
 
     def test_no_basic_auth_credentials_supplied_by_client(self, client, mocker):
         response = client.post(self.URL, json.dumps(self.test_payload), content_type='application/json')
-        assert response.status_code == 401
+        assert response.status_code == 403
 
     def test_wrong_basic_auth_credentials_supplied_by_client(self, client, mocker):
         response = client.post(
@@ -72,7 +72,7 @@ class TestVerkeersvergunningen:
             content_type='application/json',
             HTTP_AUTHORIZATION='Basic wrong:wrong'
         )
-        assert response.status_code == 401
+        assert response.status_code == 403
 
     def test_wrong_basic_auth_credentials_for_decos(self, client, mocker):
         mock_response = MockResponse(401)

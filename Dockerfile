@@ -16,7 +16,7 @@ RUN python manage.py collectstatic --no-input
 
 USER datapunt
 
-CMD ["/deploy/docker-run.sh"]
+CMD ["/app/deploy/docker-run.sh"]
 
 
 # stage 2, dev

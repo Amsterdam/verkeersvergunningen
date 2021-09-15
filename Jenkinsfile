@@ -1,6 +1,7 @@
 #!groovy
 def PROJECT_NAME = "verkeersvergunningen"
 def PLAYBOOK = 'deploy.yml'
+def SLACK_CHANNEL = '#waarnemingen-deployments'
 def SLACK_MESSAGE = [
     "title_link": BUILD_URL,
     "fields": [

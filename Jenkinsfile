@@ -60,7 +60,6 @@ pipeline {
 
                 stage('Deploy to acceptance') {
                     when {
-                        environment name: 'IS_RELEASE', value: 'true'
                         branch 'master'
                     }
                     steps {

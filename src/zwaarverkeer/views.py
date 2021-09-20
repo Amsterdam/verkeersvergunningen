@@ -18,13 +18,18 @@ class HasPermitRequestSerializer(serializers.Serializer):
     passage_at = serializers.DateTimeField()
 
 
-class HasPermitResponseSerializer(serializers.Serializer):
+class PermitSerializer(serializers.Serializer):
+    permit_type = serializers.CharField(required=False, allow_null=True)
+    permit_description = serializers.CharField(required=False)
+    date_from = serializers.DateTimeField(required=False, allow_null=True)
+    date_until = serializers.DateTimeField(required=False, allow_null=True)
+
+
+class GetPermitsResponseSerializer(serializers.Serializer):
     number_plate = serializers.CharField(min_length=6, max_length=6)
     passage_at = serializers.DateTimeField()
     has_permit = serializers.BooleanField()
-    permit_type = serializers.CharField(required=False, allow_null=True)
-    date_from = serializers.DateTimeField(required=False, allow_null=True)
-    date_until = serializers.DateTimeField(required=False, allow_null=True)
+    permits = PermitSerializer(many=True)
 
 
 class HasPermitView(CsrfExemptMixin, APIView):
@@ -33,7 +38,7 @@ class HasPermitView(CsrfExemptMixin, APIView):
 
     @swagger_auto_schema(
         request_body=HasPermitRequestSerializer,
-        responses={200: HasPermitResponseSerializer},  # Define more responses here
+        responses={200: GetPermitsResponseSerializer},  # TODO:Define more responses here
     )
     def post(self, request):
         req_ser = HasPermitRequestSerializer(data=request.data)
@@ -46,18 +51,17 @@ class HasPermitView(CsrfExemptMixin, APIView):
 
         try:
             decos = DecosJoin()
-            has_permit, permit_type = decos.get_permit(number_plate, passage_at)
+            permits = decos.get_permits(number_plate, passage_at)
             response = {
                 'number_plate': number_plate,
                 'passage_at': request.data['passage_at'],
-                'has_permit': has_permit,
-                'permit_type': permit_type,
-                'date_from': None,
-                'date_until': None,
+                'has_permit': len(permits) > 0,
+                'permits': permits,
             }
-            ser = HasPermitResponseSerializer(data=response)
+            ser = GetPermitsResponseSerializer(data=response)
             ser.is_valid(raise_exception=True)
             return Response(ser.data)
 
         except ImmediateHttpResponse as e:
             return e.response
+        # TODO: also catch validation exception

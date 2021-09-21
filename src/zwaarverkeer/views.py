@@ -13,7 +13,7 @@ from zwaarverkeer.tools import ImmediateHttpResponse
 log = logging.getLogger(__name__)
 
 
-class HasPermitRequestSerializer(serializers.Serializer):
+class GetPermitRequestSerializer(serializers.Serializer):
     number_plate = serializers.CharField(min_length=6, max_length=6)
     passage_at = serializers.DateTimeField()
 
@@ -21,8 +21,8 @@ class HasPermitRequestSerializer(serializers.Serializer):
 class PermitSerializer(serializers.Serializer):
     permit_type = serializers.CharField(required=False, allow_null=True)
     permit_description = serializers.CharField(required=False)
-    date_from = serializers.DateTimeField(required=False, allow_null=True)
-    date_until = serializers.DateTimeField(required=False, allow_null=True)
+    valid_from = serializers.DateTimeField(required=True)  # (required=False, allow_null=True)
+    valid_until = serializers.DateTimeField(required=True)    # (required=False, allow_null=True)
 
 
 class GetPermitsResponseSerializer(serializers.Serializer):
@@ -37,13 +37,13 @@ class HasPermitView(CsrfExemptMixin, APIView):
     authentication_classes = [BasicAuthWithKeys]
 
     @swagger_auto_schema(
-        request_body=HasPermitRequestSerializer,
+        request_body=GetPermitRequestSerializer,
         responses={200: GetPermitsResponseSerializer},  # TODO:Define more responses here
     )
     def post(self, request):
-        req_ser = HasPermitRequestSerializer(data=request.data)
+        req_ser = GetPermitRequestSerializer(data=request.data)
         if not req_ser.is_valid():
-            # RETURN ERRORS CORRECTLY HERE
+            # TODO: RETURN ERRORS CORRECTLY HERE
             return Response(req_ser.errors)
 
         number_plate = request.data['number_plate'].upper()
@@ -65,3 +65,4 @@ class HasPermitView(CsrfExemptMixin, APIView):
         except ImmediateHttpResponse as e:
             return e.response
         # TODO: also catch validation exception
+        # TODO: test whether this also works with drf exception handling

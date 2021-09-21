@@ -19,6 +19,13 @@ class MockResponse:
     def json(self):
         return self.json_content
 
+
+def create_basic_auth_headers(username, password):
+    credentials = f"{username}:{password}"
+    auth_string = 'Basic ' + base64.b64encode(credentials.encode("utf-8")).decode("utf-8")
+    return {'HTTP_AUTHORIZATION': auth_string}
+
+
 class TestDecosJoin:
     def setup(self):
         pass
@@ -249,12 +256,19 @@ class TestVerkeersvergunningen:
         self.URL = '/zwaarverkeer/get_permits/'
         self.test_payload = {'number_plate': '1234AB', 'passage_at': '2022-10-10T06:30:00.000'}
 
-        # Basic auth
-        credentials = f"{settings.CLEOPATRA_BASIC_AUTH_USER}:{settings.CLEOPATRA_BASIC_AUTH_PASS}"
-        auth_string = 'Basic ' + base64.b64encode(credentials.encode("utf-8")).decode("utf-8")
-        self.auth_headers = {'HTTP_AUTHORIZATION': auth_string}
+        self.auth_headers = create_basic_auth_headers(
+            settings.CLEOPATRA_BASIC_AUTH_USER,
+            settings.CLEOPATRA_BASIC_AUTH_PASS
+        )
 
-    def test_basics(self, client, mocker):
+    @pytest.mark.parametrize(
+        'passage_at, expected_passage_at',
+        [
+            ('2022-10-10T06:30:00.000', '2022-10-10T06:30:00+02:00'),  # Naive datetime
+            ('2022-10-10T06:30:00+02:00', '2022-10-10T06:30:00+02:00')  # Timezone-aware datetime
+        ]
+    )
+    def test_basics(self, client, mocker, passage_at, expected_passage_at):
         decos_response = {
             'count': 1,
             'content': [
@@ -271,6 +285,9 @@ class TestVerkeersvergunningen:
         mock_response = MockResponse(200, json_content=decos_response)
         mocker.patch('zwaarverkeer.views.DecosJoin._do_request', return_value=mock_response)
 
+        payload = self.test_payload
+        payload['passage_at'] = passage_at
+
         response = client.post(
             self.URL,
             json.dumps(self.test_payload),
@@ -282,7 +299,7 @@ class TestVerkeersvergunningen:
         decos_permit = decos_response['content'][0]['fields']
         expected = {
             'number_plate': self.test_payload['number_plate'],
-            'passage_at': make_aware(parse(self.test_payload['passage_at'])).isoformat(),
+            'passage_at': expected_passage_at,
             'has_permit': True,
             'permits': [
                 {
@@ -313,16 +330,16 @@ class TestVerkeersvergunningen:
         response = client.delete(self.URL, **self.auth_headers)
         assert response.status_code == 405
 
-    def test_no_basic_auth_credentials_supplied_by_client(self, client, mocker):
+    def test_no_basic_auth_credentials_supplied_by_client(self, client):
         response = client.post(self.URL, json.dumps(self.test_payload), content_type='application/json')
         assert response.status_code == 403
 
-    def test_wrong_basic_auth_credentials_supplied_by_client(self, client, mocker):
+    def test_wrong_basic_auth_credentials_supplied_by_client(self, client):
         response = client.post(
             self.URL,
             json.dumps(self.test_payload),
             content_type='application/json',
-            HTTP_AUTHORIZATION='Basic wrong:wrong'
+            **create_basic_auth_headers('wrong_user', 'wrong_pass')
         )
         assert response.status_code == 403
 

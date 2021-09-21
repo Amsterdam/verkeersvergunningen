@@ -65,8 +65,6 @@ class DecosJoin:
         response_json = response.json()
 
         permits = []  # a temporary list to get the permits
-        if not response_json.get('count'):
-            return permits
 
         # Loop over te permits and get the details
         for permit_info in response_json['content']:

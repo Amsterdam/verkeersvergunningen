@@ -4,7 +4,6 @@ import json
 import pytest
 from dateutil.parser import parse
 from django.conf import settings
-from django.utils.timezone import make_aware
 
 from zwaarverkeer.decos_join import DecosJoin
 
@@ -31,7 +30,7 @@ class TestDecosJoin:
         pass
 
     @pytest.mark.parametrize(
-        'passage_at, permit_type, valid_from, valid_until',
+        'passage_at, permit_type, valid_from, valid_until, expected_valid_from, expected_valid_until',
         [
             # Year permit
             (
@@ -39,6 +38,8 @@ class TestDecosJoin:
                 'Jaarontheffing gewicht en ondeelbaar',
                 '2021-09-10T00:00:00.000',
                 '2022-09-10T00:00:00.000',
+                '2021-09-10T00:00:00.000+2',
+                '2022-09-11T00:00:00.000+2',
             ),
 
             # day permit today, passage before 6
@@ -46,7 +47,9 @@ class TestDecosJoin:
                 '2021-10-10T05:30:00.000',
                 'Dagontheffing',
                 '2021-10-10T00:00:00.000',
-                '2022-10-10T00:00:00.000',
+                '2021-10-10T00:00:00.000',
+                '2021-10-10T00:00:00.000+2',
+                '2021-10-11T06:00:00.000+2',
             ),
 
             # day permit today, passage after 6
@@ -54,7 +57,9 @@ class TestDecosJoin:
                 '2021-10-10T06:30:00.000',
                 'Dagontheffing',
                 '2021-10-10T00:00:00.000',
-                '2022-10-10T00:00:00.000',
+                '2021-10-10T00:00:00.000',
+                '2021-10-10T00:00:00.000+2',
+                '2021-10-11T06:00:00.000+2',
             ),
 
             # day permit yesterday, passage before 6
@@ -62,11 +67,21 @@ class TestDecosJoin:
                 '2021-10-10T05:30:00.000',
                 'Dagontheffing',
                 '2021-10-09T00:00:00.000',
-                '2022-10-09T00:00:00.000',
+                '2021-10-09T00:00:00.000',
+                '2021-10-09T00:00:00.000+2',
+                '2021-10-10T06:00:00.000+2',
             ),
 
-            # day permit yesterday, passage after 6:
-            # this would give no result from the endpoint, so no test for this one
+            # day permit yesterday, passage after 6
+            # this means the permit is not valid for this passing, so we return None
+            (
+                    '2021-10-10T06:30:00.000',
+                    'Dagontheffing',
+                    '2021-10-09T00:00:00.000',
+                    '2021-10-09T00:00:00.000',
+                    None,
+                    None
+            ),
 
             # route permit today
             (
@@ -74,10 +89,12 @@ class TestDecosJoin:
                 'Routeontheffing gewicht en ondeelbaar',
                 '2021-10-10T00:00:00.000',
                 '2022-10-10T00:00:00.000',
+                '2021-10-10T00:00:00.000+2',
+                '2022-10-11T00:00:00.000+2',
             ),
         ],
     )
-    def test_get_permits_with_a_single_permit(self, mocker, passage_at, permit_type, valid_from, valid_until):
+    def test_get_permits_with_a_single_permit(self, mocker, passage_at, permit_type, valid_from, valid_until, expected_valid_from, expected_valid_until):
         decos_response = {
             'count': 1,
             'content': [
@@ -96,12 +113,14 @@ class TestDecosJoin:
 
         decos = DecosJoin()
         result = decos.get_permits('ABC123', parse(passage_at))
-        expected = [{
-            'permit_type': permit_type,
-            'permit_description': 'Ontheffing 7,5 ton Binnenstad ABC123, DEF456, GEJ789',
-            'valid_from': make_aware(parse(valid_from)),
-            'valid_until': make_aware(parse(valid_until)),
-        }]
+        expected = []
+        if expected_valid_from:
+            expected.append({
+                'permit_type': permit_type,
+                'permit_description': 'Ontheffing 7,5 ton Binnenstad ABC123, DEF456, GEJ789',
+                'valid_from': parse(expected_valid_from),
+                'valid_until': parse(expected_valid_until),
+            })
         assert result == expected
 
 
@@ -116,106 +135,131 @@ class TestDecosJoin:
                     {
                         'permit_type': 'Dagontheffing',
                         'valid_from': '2021-10-10T00:00:00.000',
-                        'valid_until': '2022-10-10T00:00:00.000',
+                        'valid_until': '2021-10-10T00:00:00.000',
+                        'expected_valid_from': '2021-10-10T00:00:00.000+2',
+                        'expected_valid_until': '2021-10-11T06:00:00.000+2',
                     },
                     {
                         'permit_type': 'Jaarontheffing gewicht en ondeelbaar',
                         'valid_from': '2021-09-10T00:00:00.000',
                         'valid_until': '2022-09-10T00:00:00.000',
+                        'expected_valid_from': '2021-09-10T00:00:00.000+2',
+                        'expected_valid_until': '2022-09-11T00:00:00.000+2',
                     }
                 ]
             ),
 
             # Passage after 6 - both day permit (valid today) and a year permit
             (
-                    '2021-10-10T06:30:00.000',
-                    [
-                        {
-                            'permit_type': 'Dagontheffing',
-                            'valid_from': '2021-10-10T00:00:00.000',
-                            'valid_until': '2022-10-10T00:00:00.000',
-                        },
-                        {
-                            'permit_type': 'Jaarontheffing gewicht en ondeelbaar',
-                            'valid_from': '2021-09-10T00:00:00.000',
-                            'valid_until': '2022-09-10T00:00:00.000',
-                        }
-                    ]
+                '2021-10-10T06:30:00.000',
+                [
+                    {
+                        'permit_type': 'Dagontheffing',
+                        'valid_from': '2021-10-10T00:00:00.000',
+                        'valid_until': '2021-10-10T00:00:00.000',
+                        'expected_valid_from': '2021-10-10T00:00:00.000+2',
+                        'expected_valid_until': '2021-10-11T06:00:00.000+2',
+                    },
+                    {
+                        'permit_type': 'Jaarontheffing gewicht en ondeelbaar',
+                        'valid_from': '2021-09-10T00:00:00.000',
+                        'valid_until': '2022-09-10T00:00:00.000',
+                        'expected_valid_from': '2021-09-10T00:00:00.000+2',
+                        'expected_valid_until': '2022-09-11T00:00:00.000+2',
+                    }
+                ]
             ),
 
             # Passage before 6 - both day permit (valid yesterday) and a year permit
             (
-                    '2021-10-10T05:30:00.000',
-                    [
-                        {
-                            'permit_type': 'Dagontheffing',
-                            'valid_from': '2021-10-09T00:00:00.000',
-                            'valid_until': '2022-10-09T00:00:00.000',
-                        },
-                        {
-                            'permit_type': 'Jaarontheffing gewicht en ondeelbaar',
-                            'valid_from': '2021-09-10T00:00:00.000',
-                            'valid_until': '2022-09-10T00:00:00.000',
-                        }
-                    ]
+                '2021-10-10T05:30:00.000',
+                [
+                    {
+                        'permit_type': 'Dagontheffing',
+                        'valid_from': '2021-10-09T00:00:00.000',
+                        'valid_until': '2021-10-09T00:00:00.000',
+                        'expected_valid_from': '2021-10-09T00:00:00.000+2',
+                        'expected_valid_until': '2021-10-10T06:00:00.000+2',
+                    },
+                    {
+                        'permit_type': 'Jaarontheffing gewicht en ondeelbaar',
+                        'valid_from': '2021-09-10T00:00:00.000',
+                        'valid_until': '2022-09-10T00:00:00.000',
+                        'expected_valid_from': '2021-09-10T00:00:00.000+2',
+                        'expected_valid_until': '2022-09-11T00:00:00.000+2',
+                    }
+                ]
             ),
 
             # Both day and route permits
             (
-                    '2021-10-10T05:30:00.000',
-                    [
-                        {
-                            'permit_type': 'Dagontheffing',
-                            'valid_from': '2021-10-10T00:00:00.000',
-                            'valid_until': '2022-10-10T00:00:00.000',
-                        },
-                        {
-                            'permit_type': 'Routeontheffing gewicht en ondeelbaar',
-                            'valid_from': '2021-09-10T00:00:00.000',
-                            'valid_until': '2022-09-10T00:00:00.000',
-                        }
-                    ]
+                '2021-10-10T05:30:00.000',
+                [
+                    {
+                        'permit_type': 'Dagontheffing',
+                        'valid_from': '2021-10-10T00:00:00.000',
+                        'valid_until': '2021-10-10T00:00:00.000',
+                        'expected_valid_from': '2021-10-10T00:00:00.000+2',
+                        'expected_valid_until': '2021-10-11T06:00:00.000+2',
+                    },
+                    {
+                        'permit_type': 'Routeontheffing gewicht en ondeelbaar',
+                        'valid_from': '2021-09-10T00:00:00.000',
+                        'valid_until': '2022-09-10T00:00:00.000',
+                        'expected_valid_from': '2021-09-10T00:00:00.000+2',
+                        'expected_valid_until': '2022-09-11T00:00:00.000+2',
+                    }
+                ]
             ),
 
             # Both year and route permits
             (
-                    '2021-10-10T05:30:00.000',
-                    [
-                        {
-                            'permit_type': 'Jaarontheffing gewicht en ondeelbaar',
-                            'valid_from': '2021-09-10T00:00:00.000',
-                            'valid_until': '2022-09-10T00:00:00.000',
-                        },
-                        {
-                            'permit_type': 'Routeontheffing gewicht en ondeelbaar',
-                            'valid_from': '2021-09-10T00:00:00.000',
-                            'valid_until': '2022-09-10T00:00:00.000',
-                        }
-                    ]
+                '2021-10-10T05:30:00.000',
+                [
+                    {
+                        'permit_type': 'Jaarontheffing gewicht en ondeelbaar',
+                        'valid_from': '2021-09-10T00:00:00.000',
+                        'valid_until': '2022-09-10T00:00:00.000',
+                        'expected_valid_from': '2021-09-10T00:00:00.000+2',
+                        'expected_valid_until': '2022-09-11T00:00:00.000+2',
+                    },
+                    {
+                        'permit_type': 'Routeontheffing gewicht en ondeelbaar',
+                        'valid_from': '2021-09-10T00:00:00.000',
+                        'valid_until': '2022-09-10T00:00:00.000',
+                        'expected_valid_from': '2021-09-10T00:00:00.000+2',
+                        'expected_valid_until': '2022-09-11T00:00:00.000+2',
+                    }
+                ]
             ),
 
             # Day, year and route permits
             (
-                    '2021-10-10T05:30:00.000',
-                    [
-                        {
-                            'permit_type': 'Dagontheffing',
-                            'valid_from': '2021-10-10T00:00:00.000',
-                            'valid_until': '2022-10-10T00:00:00.000',
-                        },
-                        {
-                            'permit_type': 'Jaarontheffing gewicht en ondeelbaar',
-                            'valid_from': '2021-09-10T00:00:00.000',
-                            'valid_until': '2022-09-10T00:00:00.000',
-                        },
-                        {
-                            'permit_type': 'Routeontheffing gewicht en ondeelbaar',
-                            'valid_from': '2021-09-10T00:00:00.000',
-                            'valid_until': '2022-09-10T00:00:00.000',
-                        }
-                    ]
+                '2021-10-10T05:30:00.000',
+                [
+                    {
+                        'permit_type': 'Dagontheffing',
+                        'valid_from': '2021-10-10T00:00:00.000',
+                        'valid_until': '2021-10-10T00:00:00.000',
+                        'expected_valid_from': '2021-10-10T00:00:00.000+2',
+                        'expected_valid_until': '2021-10-11T06:00:00.000+2',
+                    },
+                    {
+                        'permit_type': 'Jaarontheffing gewicht en ondeelbaar',
+                        'valid_from': '2021-09-10T00:00:00.000',
+                        'valid_until': '2022-09-10T00:00:00.000',
+                        'expected_valid_from': '2021-09-10T00:00:00.000+2',
+                        'expected_valid_until': '2022-09-11T00:00:00.000+2',
+                    },
+                    {
+                        'permit_type': 'Routeontheffing gewicht en ondeelbaar',
+                        'valid_from': '2021-09-10T00:00:00.000',
+                        'valid_until': '2022-09-10T00:00:00.000',
+                        'expected_valid_from': '2021-09-10T00:00:00.000+2',
+                        'expected_valid_until': '2022-09-11T00:00:00.000+2',
+                    }
+                ]
             ),
-
         ],
     )
     def test_get_permits_with_multiple_permits(self, mocker, passage_at, permits):
@@ -243,8 +287,8 @@ class TestDecosJoin:
             expected_permit = {
                 'permit_type': permit_info['permit_type'],
                 'permit_description': 'Ontheffing 7,5 ton Binnenstad ABC123, DEF456, GEJ789',
-                'valid_from': make_aware(parse(permit_info['valid_from'])),
-                'valid_until': make_aware(parse(permit_info['valid_until'])),
+                'valid_from': parse(permit_info['expected_valid_from']),
+                'valid_until': parse(permit_info['expected_valid_until']),
             }
             expected.append(expected_permit)
 
@@ -305,8 +349,8 @@ class TestVerkeersvergunningen:
                 {
                     'permit_type': decos_permit['text17'],
                     'permit_description': decos_permit['subject1'],
-                    'valid_from': make_aware(parse(decos_permit['date6'])).isoformat(),
-                    'valid_until': make_aware(parse(decos_permit['date7'])).isoformat(),
+                    'valid_from': '2021-10-10T00:00:00+02:00',
+                    'valid_until': '2022-10-11T06:00:00+02:00',
                 }
             ]
         }

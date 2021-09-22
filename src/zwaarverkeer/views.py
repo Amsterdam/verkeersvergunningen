@@ -2,10 +2,12 @@ import logging
 
 from braces.views import CsrfExemptMixin
 from dateutil import parser
+
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
 from zwaarverkeer.authentication import BasicAuthWithKeys
 from zwaarverkeer.decos_join import DecosJoin
 from zwaarverkeer.tools import ImmediateHttpResponse
@@ -43,7 +45,7 @@ class HasPermitView(CsrfExemptMixin, APIView):
     def post(self, request):
         req_ser = GetPermitRequestSerializer(data=request.data)
         if not req_ser.is_valid():
-            # TODO: RETURN ERRORS CORRECTLY HERE
+            # TODO: Return errors correctly here
             return Response(req_ser.errors)
 
         number_plate = request.data['number_plate'].upper()

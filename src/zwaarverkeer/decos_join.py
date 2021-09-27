@@ -29,6 +29,7 @@ class DecosJoin:
         return os.path.join(self.base_url, settings.ZWAAR_VERKEER_ZAAKNUMMER, 'FOLDERS', *args)
 
     def _get_filters(self, number_plate, valid_from, valid_until):
+        # TODO: Use https://docs.djangoproject.com/en/3.2/ref/request-response/#querydict-objects
         filters = f"?select={DECOS_NUMBER_PLATE},{DECOS_PERMIT_TYPE},{DECOS_PERMIT_DESCRIPTION},{DECOS_PERMIT_VALID_FROM},{DECOS_PERMIT_VALID_UNTIL}" \
                   f"&filter={DECOS_NUMBER_PLATE} has '{number_plate}'" \
                   f" and {DECOS_PERMIT_PROCESSED} eq 'J'" \
@@ -42,7 +43,9 @@ class DecosJoin:
         return requests.get(
             url,
             auth=(self.auth_user, self.auth_pass),
-            headers={'accept': 'application/itemdata'})
+            headers={'accept': 'application/itemdata'},
+            timeout=5,
+        )
 
     def _get_date_strings(self, passage_at):
         valid_from = passage_at.date().isoformat()
@@ -59,19 +62,33 @@ class DecosJoin:
         valid_from, valid_until = self._get_date_strings(passage_at)
         url = self._build_url(self._get_filters(number_plate, valid_from, valid_until))
         response = self._do_request(url)
+
+        # TODO: account for pagination in the decos join api
+
+        # TODO: Account for more errors than just "not a 200". Use response.raise_for_status() and
+        # TODO: add a try/except around _do_request() call
         if response.status_code != 200:
             raise ImmediateHttpResponse(response=HttpResponse("We got an error response from Decos Join", status=502))
 
         permits = []  # a temporary list to get the permits
+        content = response.json().get('content')
+
+        if not content or not isinstance(content, list):
+            return permits
 
         # Loop over te permits and get the details
-        response_json = response.json()
-        for permit_info in response_json['content']:
+        for permit_info in content:
             fields = permit_info['fields']
             permit_type = fields.get(DECOS_PERMIT_TYPE)
             permit_description = fields.get(DECOS_PERMIT_DESCRIPTION)
             valid_from = make_aware(parser.parse(fields[DECOS_PERMIT_VALID_FROM]))
             valid_until = make_aware(parser.parse(fields[DECOS_PERMIT_VALID_UNTIL]))
+
+            if not permit_type:
+                # We have no permit type so we cannot determine whether this permit is
+                # actually valid, AND we cannot determine the correct valid_until time.
+                # Therefore we disregard this permit by continuing to the next one.
+                continue
 
             # Set correct validity of the permit: day permits are valid until 06:00 the day after, and year and
             # route permits are valid until the end of the last day (so 00:00:00 the next day)

@@ -1,3 +1,4 @@
+import logging
 import os
 from datetime import time, timedelta
 
@@ -16,6 +17,8 @@ DECOS_PERMIT_VALID_FROM = 'date6'
 DECOS_PERMIT_VALID_UNTIL = 'date7'
 DECOS_PERMIT_PROCESSED = 'processed'  # whether the city has decided on giving or denying the permit
 DECOS_PERMIT_RESULT = 'dfunction'  # this is whether the permit was given or denied
+
+log = logging.getLogger(__name__)
 
 
 class DecosJoin:
@@ -68,6 +71,7 @@ class DecosJoin:
         # TODO: Account for more errors than just "not a 200". Use response.raise_for_status() and
         # TODO: add a try/except around _do_request() call
         if response.status_code != 200:
+            log.error(f"We got an {response.status_code} error from Decos Join saying: {response.content}")
             raise ImmediateHttpResponse(response=HttpResponse("We got an error response from Decos Join", status=502))
 
         permits = []  # a temporary list to get the permits

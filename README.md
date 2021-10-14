@@ -3,14 +3,17 @@ A proxy-api which exposes vergunningen by querying the decos api. The focus for 
 to the Cleopatra system, but this may change in the future to also include exposing more permits to other third parties.
 
 ### Getting started
-
 1. Make a new virtualenv
 2. Install requirements: `make install`
 3. Run tests: `make test`
 
 ### Development
+We follow the [general Django project structure](https://github.com/Amsterdam/opdrachten_team_dev/tree/master/project_architecture)
+and [our common dependency management](https://github.com/Amsterdam/opdrachten_team_dev/tree/master/dependency_management)
+
 - Upgrade dependencies: run `make upgrade` in the virtualenv
 - Run local dev version: `make dev`
+- To expose ports locally, copy docker-compose.override.yml.example to docker-compose.override.yml
 
 ### Decos Join
 Decos Join has a rather "challenging" API. Some things to note about the api:

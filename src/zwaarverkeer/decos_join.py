@@ -10,7 +10,7 @@ from django.utils.timezone import is_naive, make_aware
 
 from zwaarverkeer.tools import ImmediateHttpResponse
 
-DECOS_NUMBER_PLATE = 'text48'  # Always without any hyphen (-)
+DECOS_NUMBER_PLATE = 'text49'  # Number plates should always be without any hyphen (-)
 DECOS_PERMIT_TYPE = 'text17'  # jaarontheffing / dagontheffing / routeontheffing
 DECOS_PERMIT_DESCRIPTION = 'subject1'  # omschrijving zaak
 DECOS_PERMIT_VALID_FROM = 'date6'

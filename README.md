@@ -27,4 +27,4 @@ Decos Join has a rather "challenging" API. Some things to note about the api:
 
 For easy copy pasting, here's an example of how to query the Decos Join endpoint using curl:
 
-    curl -u '<USER>:<KEY>' -H "accept:application/itemdata" "https://decosdvl.acc.amsterdam.nl/decosweb/aspx/api/v1/items/8A02814D73B3421B9C65262A45A43BD8/FOLDERS?filter=TEXT48%20has%20'XXXXXX'%20and%20DFUNCTION%20eq%20'Verleend'%20and%20PROCESSED%20eq%20'J'"
+    curl -u '<USER>:<KEY>' -H "accept:application/itemdata" "https://decosdvl.acc.amsterdam.nl/decosweb/aspx/api/v1/items/8A02814D73B3421B9C65262A45A43BD8/FOLDERS?filter=TEXT49%20has%20'XXXXXX'%20and%20DFUNCTION%20eq%20'Verleend'%20and%20PROCESSED%20eq%20'J'"

@@ -20,11 +20,11 @@ coreschema==0.0.4
     #   drf-yasg
 django-basicauth==0.5.3
     # via -r requirements.in
-django-braces==1.14.0
+django-braces==1.15.0
     # via -r requirements.in
-django-extensions==3.1.3
+django-extensions==3.1.5
     # via -r requirements.in
-django==3.2.8
+django==3.2.9
     # via
     #   -r requirements.in
     #   django-basicauth
@@ -44,11 +44,11 @@ inflection==0.5.1
     # via drf-yasg
 itypes==1.2.0
     # via coreapi
-jinja2==3.0.2
+jinja2==3.0.3
     # via coreschema
 markupsafe==2.0.1
     # via jinja2
-packaging==21.0
+packaging==21.2
     # via drf-yasg
 pyparsing==2.4.7
     # via packaging
@@ -62,14 +62,12 @@ requests==2.26.0
     #   coreapi
 ruamel.yaml.clib==0.2.6
     # via ruamel.yaml
-ruamel.yaml==0.17.16
+ruamel.yaml==0.17.17
     # via drf-yasg
 sentry-sdk==1.4.3
     # via -r requirements.in
 six==1.16.0
-    # via
-    #   django-braces
-    #   python-dateutil
+    # via python-dateutil
 sqlparse==0.4.2
     # via django
 uritemplate==4.1.1

@@ -1,7 +1,7 @@
 # Define all requirements, only pin when necessary (and if so, add a comment explaining why).
 # See # https://git.datapunt.amsterdam.nl/Datapunt/python-best-practices/blob/master/dependency_management/
 
-django
+django<4  # pytz is not a dependency from django 4 anymore, but still required by drf. Drf added it as a dependency in master, but didn't make a release yet. So this can be removed after a new drf release has been made higher than the current 3.12.4
 sentry-sdk
 django_extensions
 django-basicauth
@@ -10,4 +10,3 @@ python-dateutil
 djangorestframework
 django-braces
 drf-yasg
-pytz

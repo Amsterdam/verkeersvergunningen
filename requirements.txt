@@ -6,8 +6,6 @@
 #
 asgiref==3.4.1
     # via django
-backports.zoneinfo==0.2.1
-    # via django
 certifi==2021.10.8
     # via
     #   requests
@@ -20,7 +18,7 @@ coreschema==0.0.4
     # via
     #   coreapi
     #   drf-yasg
-django==4.0
+django==3.2.10
     # via
     #   -r requirements.in
     #   django-basicauth
@@ -57,7 +55,7 @@ pyparsing==3.0.6
 python-dateutil==2.8.2
     # via -r requirements.in
 pytz==2021.3
-    # via -r requirements.in
+    # via django
 requests==2.26.0
     # via
     #   -r requirements.in

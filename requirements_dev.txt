@@ -10,10 +10,6 @@ asgiref==3.4.1
     #   django
 attrs==21.2.0
     # via pytest
-backports.zoneinfo==0.2.1
-    # via
-    #   -r ./requirements.txt
-    #   django
 certifi==2021.10.8
     # via
     #   -r ./requirements.txt
@@ -36,7 +32,7 @@ coreschema==0.0.4
     #   drf-yasg
 coverage[toml]==6.2
     # via pytest-cov
-django==4.0
+django==3.2.10
     # via
     #   -r ./requirements.txt
     #   django-basicauth
@@ -110,7 +106,9 @@ pytest-mock==3.6.1
 python-dateutil==2.8.2
     # via -r ./requirements.txt
 pytz==2021.3
-    # via -r ./requirements.txt
+    # via
+    #   -r ./requirements.txt
+    #   django
 requests==2.26.0
     # via
     #   -r ./requirements.txt

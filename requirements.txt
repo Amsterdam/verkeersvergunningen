@@ -10,7 +10,7 @@ certifi==2021.10.8
     # via
     #   requests
     #   sentry-sdk
-charset-normalizer==2.0.10
+charset-normalizer==2.0.12
     # via requests
 coreapi==2.3.3
     # via drf-yasg
@@ -18,7 +18,7 @@ coreschema==0.0.4
     # via
     #   coreapi
     #   drf-yasg
-django==3.2.11
+django==3.2.12
     # via
     #   -r requirements.in
     #   django-basicauth
@@ -62,11 +62,11 @@ requests==2.27.1
     # via
     #   -r requirements.in
     #   coreapi
-ruamel.yaml==0.17.20
+ruamel-yaml==0.17.21
     # via drf-yasg
-ruamel.yaml.clib==0.2.6
-    # via ruamel.yaml
-sentry-sdk==1.5.3
+ruamel-yaml-clib==0.2.6
+    # via ruamel-yaml
+sentry-sdk==1.5.5
     # via -r requirements.in
 six==1.16.0
     # via python-dateutil

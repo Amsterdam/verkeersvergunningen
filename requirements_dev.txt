@@ -15,7 +15,7 @@ certifi==2021.10.8
     #   -r ./requirements.txt
     #   requests
     #   sentry-sdk
-charset-normalizer==2.0.10
+charset-normalizer==2.0.12
     # via
     #   -r ./requirements.txt
     #   requests
@@ -30,9 +30,9 @@ coreschema==0.0.4
     #   -r ./requirements.txt
     #   coreapi
     #   drf-yasg
-coverage[toml]==6.2
+coverage[toml]==6.3.1
     # via pytest-cov
-django==3.2.11
+django==3.2.12
     # via
     #   -r ./requirements.txt
     #   django-basicauth
@@ -81,7 +81,7 @@ packaging==21.3
     #   pytest
 pep517==0.12.0
     # via pip-tools
-pip-tools==6.4.0
+pip-tools==6.5.1
     # via -r requirements_dev.in
 pluggy==1.0.0
     # via pytest
@@ -91,7 +91,7 @@ pyparsing==3.0.7
     # via
     #   -r ./requirements.txt
     #   packaging
-pytest==6.2.5
+pytest==7.0.1
     # via
     #   -r requirements_dev.in
     #   pytest-cov
@@ -101,7 +101,7 @@ pytest-cov==3.0.0
     # via -r requirements_dev.in
 pytest-django==4.5.2
     # via -r requirements_dev.in
-pytest-mock==3.6.1
+pytest-mock==3.7.0
     # via -r requirements_dev.in
 python-dateutil==2.8.2
     # via -r ./requirements.txt
@@ -114,15 +114,15 @@ requests==2.27.1
     # via
     #   -r ./requirements.txt
     #   coreapi
-ruamel.yaml==0.17.20
+ruamel-yaml==0.17.21
     # via
     #   -r ./requirements.txt
     #   drf-yasg
-ruamel.yaml.clib==0.2.6
+ruamel-yaml-clib==0.2.6
     # via
     #   -r ./requirements.txt
-    #   ruamel.yaml
-sentry-sdk==1.5.3
+    #   ruamel-yaml
+sentry-sdk==1.5.5
     # via -r ./requirements.txt
 six==1.16.0
     # via
@@ -132,12 +132,11 @@ sqlparse==0.4.2
     # via
     #   -r ./requirements.txt
     #   django
-toml==0.10.2
-    # via pytest
-tomli==2.0.0
+tomli==2.0.1
     # via
     #   coverage
     #   pep517
+    #   pytest
 uritemplate==4.1.1
     # via
     #   -r ./requirements.txt
@@ -148,7 +147,7 @@ urllib3==1.26.8
     #   -r ./requirements.txt
     #   requests
     #   sentry-sdk
-werkzeug==2.0.2
+werkzeug==2.0.3
     # via -r requirements_dev.in
 wheel==0.37.1
     # via pip-tools

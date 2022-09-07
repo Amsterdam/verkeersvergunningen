@@ -6,12 +6,10 @@ from django.conf import settings
 from django.http import HttpResponse
 from requests import RequestException
 
-from main.tools import ImmediateHttpResponse
-
 log = logging.getLogger(__name__)
 
 
-class DecosJoin:
+class DecosBase:
     def __init__(self):
         self.base_url = settings.DECOS_BASE_URL
         self.auth_user = settings.DECOS_BASIC_AUTH_USER
@@ -50,3 +48,18 @@ class DecosJoin:
         # That way we can loop over them and check whether they are day permits and if so they are also valid
         valid_until = (passage_at.date() - timedelta(days=1)).isoformat()
         return valid_from, valid_until
+
+
+class ImmediateHttpResponse(Exception):
+    """
+    This exception is used to interrupt the flow of processing to immediately
+    return a custom HttpResponse.
+    """
+    _response = HttpResponse("Nothing provided.")
+
+    def __init__(self, response):
+        self._response = response
+
+    @property
+    def response(self):
+        return self._response

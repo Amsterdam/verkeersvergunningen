@@ -8,8 +8,8 @@ from rest_framework.views import APIView
 
 from taxi.serializers import BsnRequestSerializer, BsnRequestResponseSerializer
 from main.authentication import BasicAuthWithKeys
-from main.decos_join import DecosJoin
-from main.tools import ImmediateHttpResponse
+from main.utils import ImmediateHttpResponse
+from taxi.utils import DecosTaxi
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ class PermitView(CsrfExemptMixin, APIView):
         bsn = serializer.validated_data['bsn']
 
         try:
-            decos = DecosJoin()
+            decos = DecosTaxi()
             return Response(data=decos.get_taxi_permit(bsn))
 
         except ImmediateHttpResponse as e:

@@ -8,7 +8,7 @@ from django.conf import settings
 from django.utils import timezone
 from odata_request_parser.main import OdataSelectParser, OdataFilterParser
 
-from main.decos_join import DecosJoin
+from main.utils import DecosBase
 
 log = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ class DecosParams(Enum):
     PERMIT_RESULT = 'dfunction'  # this is whether the permit was given or denied
 
 
-class DecosZwaarverkeer(DecosJoin):
+class DecosZwaarverkeer(DecosBase):
     zwaar_verkeer_zaaknr = settings.ZWAAR_VERKEER_ZAAKNUMMER
 
     def get_permits(self, *, number_plate, passage_at):

@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from main.authentication import BasicAuthWithKeys
 from zwaarverkeer.serializers import PermitRequestSerializer, PermitsResponseSerializer
 from zwaarverkeer.utils import DecosZwaarverkeer
-from main.tools import ImmediateHttpResponse
+from main.utils import ImmediateHttpResponse
 
 log = logging.getLogger(__name__)
 

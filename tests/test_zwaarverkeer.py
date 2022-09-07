@@ -4,8 +4,9 @@ import json
 import pytest
 from dateutil.parser import parse
 from django.conf import settings
+from requests import HTTPError
 
-from zwaarverkeer.decos_join import DecosJoin
+from zwaarverkeer.utils import DecosZwaarverkeer
 
 
 class MockResponse:
@@ -18,6 +19,10 @@ class MockResponse:
     def json(self):
         return self.json_content
 
+    def raise_for_status(self):
+        if str(self.status_code) != '200':
+            raise HTTPError(str(self.status_code), response=self)
+
 
 def create_basic_auth_headers(username, password):
     credentials = f"{username}:{password}"
@@ -25,7 +30,7 @@ def create_basic_auth_headers(username, password):
     return {'HTTP_AUTHORIZATION': auth_string}
 
 
-class TestDecosJoin:
+class TestDecosZwaarverkeer:
     def setup(self):
         pass
 
@@ -109,10 +114,10 @@ class TestDecosJoin:
             ]
         }
         mock_response = MockResponse(200, json_content=decos_response)
-        mocker.patch('zwaarverkeer.views.DecosJoin._do_request', return_value=mock_response)
+        mocker.patch('zwaarverkeer.views.DecosZwaarverkeer._get_response', return_value=mock_response)
 
-        decos = DecosJoin()
-        result = decos.get_permits('ABC123', parse(passage_at))
+        decos = DecosZwaarverkeer()
+        result = decos.get_permits(number_plate='ABC123', passage_at=parse(passage_at))
         expected = []
         if expected_valid_from:
             expected.append({
@@ -278,10 +283,10 @@ class TestDecosJoin:
             }
             decos_response['content'].append(permit_dict)
         mock_response = MockResponse(200, json_content=decos_response)
-        mocker.patch('zwaarverkeer.views.DecosJoin._do_request', return_value=mock_response)
+        mocker.patch('zwaarverkeer.views.DecosZwaarverkeer._get_response', return_value=mock_response)
 
-        decos = DecosJoin()
-        result = decos.get_permits('ABC123', parse(passage_at))
+        decos = DecosZwaarverkeer()
+        result = decos.get_permits(number_plate='ABC123', passage_at=parse(passage_at))
         expected = []
         for permit_info in permits:
             expected_permit = {
@@ -327,7 +332,7 @@ class TestVerkeersvergunningen:
             ]
         }
         mock_response = MockResponse(200, json_content=decos_response)
-        mocker.patch('zwaarverkeer.views.DecosJoin._do_request', return_value=mock_response)
+        mocker.patch('zwaarverkeer.views.DecosZwaarverkeer._get_response', return_value=mock_response)
 
         payload = self.test_payload
         payload['passage_at'] = passage_at
@@ -388,8 +393,8 @@ class TestVerkeersvergunningen:
         assert response.status_code == 403
 
     def test_wrong_basic_auth_credentials_for_decos(self, client, mocker):
-        mock_response = MockResponse(401)
-        mocker.patch('zwaarverkeer.views.DecosJoin._do_request', return_value=mock_response)
+        mock_response = MockResponse(401, json_content={})
+        mocker.patch('zwaarverkeer.views.DecosZwaarverkeer._get_response', return_value=mock_response)
 
         response = client.post(
             self.URL,

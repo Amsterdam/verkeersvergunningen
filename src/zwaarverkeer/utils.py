@@ -46,11 +46,11 @@ class DecosZwaarverkeer(DecosBase):
         filter_parser = OdataFilterParser()
         select_parser.add_fields([str(p.value) for p in DecosParams])
         filters = [
-            {"_has": {DecosParams.NUMBER_PLATE.value: f"'{number_plate}'"}},
-            {"_eq": {DecosParams.PERMIT_PROCESSED.value: "'J'"}},
-            {"_eq": {DecosParams.PERMIT_RESULT.value: "'Verleend'"}},
-            {"_le": {DecosParams.PERMIT_VALID_FROM.value: f"'{valid_from}'"}},
-            {"_ge": {DecosParams.PERMIT_VALID_UNTIL.value: f"'{valid_until}'"}},
+            {"_has": {DecosParams.NUMBER_PLATE.value: number_plate}},
+            {"_eq": {DecosParams.PERMIT_PROCESSED.value: "J"}},
+            {"_eq": {DecosParams.PERMIT_RESULT.value: "Verleend"}},
+            {"_le": {DecosParams.PERMIT_VALID_FROM.value: valid_from}},
+            {"_ge": {DecosParams.PERMIT_VALID_UNTIL.value: valid_until}},
         ]
         params = {
             "select": select_parser.parse(),

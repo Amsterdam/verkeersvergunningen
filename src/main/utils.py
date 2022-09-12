@@ -29,7 +29,7 @@ class DecosBase:
             raise ImmediateHttpResponse(response=HttpResponse(
                 "We got an error response from Decos Join", status=502))
 
-        return response
+        return response.json()
 
     def _get_response(self, parameters, url):
         response = requests.get(

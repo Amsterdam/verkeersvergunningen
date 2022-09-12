@@ -48,8 +48,8 @@ class DecosTaxi(DecosBase):
             zaaknummer=self.ZAAKNUMMER.get("BSN"),
             endpoint=DecosBusiness.taxi.value,
         )
-        response = self._get(url, parameters)
-        zaaknummers = self._parse_zaaknummers(response)
+        data = self._get(url, parameters)
+        zaaknummers = self._parse_key(data)
         if not len(zaaknummers) == 1:
             raise ImmediateHttpResponse("Error finding decos_key for that BSN")
         return zaaknummers[0]
@@ -87,12 +87,12 @@ class DecosTaxi(DecosBase):
             zaaknummer=driver_decos_key, endpoint=DecosBusiness.folders.value
         )
         response = self._get(url, parameters)
-        zaaknummers = self._parse_zaaknummers(response)
-        return zaaknummers
+        driver_permits = self._parse_key(response)
+        return driver_permits
 
     def get_driver_exemption(self, driver_bsn: str) -> list[str]:
         """
-        get the documents from the driver based on the drivers key
+        get the permits from the driver based on the drivers key
         """
 
         class DecosParams(Enum):
@@ -115,13 +115,13 @@ class DecosTaxi(DecosBase):
             zaaknummer=self.ZAAKNUMMER["ZONE_ONTHEFFING"],
             endpoint=DecosBusiness.folders.value,
         )
-        response = self._get(url, parameters)
-        zaaknummers = self._parse_zaaknummers(response)
-        return zaaknummers
+        data = self._get(url, parameters)
+        driver_exemptions = self._parse_key(data)
+        return driver_exemptions
 
-    def get_enforcement_cases(self, vergunning_zaaknummer: str) -> list[str]:
+    def get_enforcement_cases(self, license_casenr: str) -> list[str]:
         """
-        get the documents from the driver based on the drivers key
+        get the cases from the driver based on the drivers key
         """
         class DecosParams(Enum):
             resultaat = "DFUNCTION"
@@ -133,24 +133,24 @@ class DecosTaxi(DecosBase):
         parameters = {
             "properties": False,
             "fetchParents": False,
-            "relTypeKey": vergunning_zaaknummer,
+            "relTypeKey": license_casenr,
             "oDataQuery.select": odata_select.parse(),
         }
         url = self._build_url(
             zaaknummer=self.ZAAKNUMMER["HANDHAVINGSZAKEN"],
             endpoint=DecosBusiness.folders.value,
         )
-        response = self._get(url, parameters)
-        zaaknummers = self._parse_zaaknummers(response)
-        return zaaknummers
+        data = self._get(url, parameters)
+        cases = self._parse_key(data)
+        return cases
 
-    def _parse_zaaknummers(self, data: dict) -> list[str]:
+    def _parse_key(self, data: dict) -> list[str]:
         """
         Get the decos key from the response data
         """
         try:
             return [c["key"] for c in data["content"]]
-        except (KeyError) as e:
+        except KeyError as e:
             raise ImmediateHttpResponse(e)
 
     def _build_url(self, *, zaaknummer: str, endpoint: str) -> str:

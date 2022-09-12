@@ -23,16 +23,16 @@ class TestDecosTaxi(SimpleTestCase):
                                          endpoint=endpoint)
         self.assertEqual(expected_url, response)
 
-    def test_parse_zaaknummer(self):
+    def test_parse_key(self):
         zaaknr = '555aaa555'
         data = mock_zaaknummer()
-        response = self.decos._parse_zaaknummers(data)
+        response = self.decos._parse_key(data)
         self.assertEqual([zaaknr], response)
 
     def test_invalid_parse_zaaknummer(self):
         data = {'invalid': 'data'}
         with pytest.raises(ImmediateHttpResponse):
-            self.decos._parse_zaaknummers(data)
+            self.decos._parse_key(data)
 
     @patch('taxi.utils.DecosTaxi._get_response',
            lambda *args, **kwargs: MockResponse(200, {
@@ -69,6 +69,8 @@ class TestDecosTaxi(SimpleTestCase):
         cases = self.decos.get_enforcement_cases(license_casenr)
         self.assertEqual(['0987654', '12345678'], cases)
 
+    @patch('taxi.utils.DecosTaxi.get_decos_key',
+           lambda *args, **kwargs: 'fake_758697')
     @patch('taxi.utils.DecosTaxi._get_response',
            lambda *args, **kwargs: MockResponse(200, {
                'content': [

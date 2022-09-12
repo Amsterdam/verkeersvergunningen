@@ -34,7 +34,7 @@ class DecosZwaarverkeer(DecosBase):
         url = self._build_url()
         params = self._get_params(number_plate=number_plate, valid_from=valid_from, valid_until=valid_until)
         response = self._get(url=url, parameters=params)
-        content = response.json().get('content')
+        content = response.get('content')
         if not content or not isinstance(content, list):
             return []
 

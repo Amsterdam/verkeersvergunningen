@@ -4,6 +4,7 @@ import json
 import pytest
 from dateutil.parser import parse
 from django.conf import settings
+from .tools import MockResponse
 
 from tests.utils import MockResponse
 from zwaarverkeer.utils import DecosZwaarverkeer

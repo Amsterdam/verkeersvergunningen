@@ -38,8 +38,8 @@ class DecosTaxi(DecosBase):
         odata_filter = OdataFilterParser()
         filters = [{"_eq": {DecosParams.bsn.value: driver_bsn}}]
         parameters = {
-            "properties": False,
-            "fetchParents": False,
+            "properties": "false",
+            "fetchParents": "false",
             "oDataQuery.select": DecosParams.bsn.value,
             "oDataQuery.filter": odata_filter.parse(filters),
         }
@@ -60,10 +60,10 @@ class DecosTaxi(DecosBase):
         """
 
         class DecosParams(Enum):
-            resultaat = "DFUNCTION"
-            afgehandeld = "PROCESSED"
             ingangsdatum_ontheffing = "DATE6"
             vervaldatum_ontheffing = "DATE7"
+            afgehandeld = "PROCESSED"
+            resultaat = "DFUNCTION"
             zaaktype = "TEXT45"
 
         odata_select = OdataSelectParser()
@@ -72,14 +72,14 @@ class DecosTaxi(DecosBase):
         filters = [
             {
                 "_or": [
-                    {"_eq": {DecosParams.zaaktype.value, "TAXXXI Zone-ontheffing"}},
+                    {"_eq": {DecosParams.zaaktype.value: "TAXXXI Zone-ontheffing"}},
                     {"_eq": {DecosParams.zaaktype.value: "TAXXXI Handhaving"}},
                 ]
             }
         ]
         parameters = {
-            "properties": False,
-            "fetchParents": False,
+            "properties": "false",
+            "fetchParents": "false",
             "oDataQuery.select": odata_select.parse(),
             "oDataQuery.filter": odata_filter.parse(filters),
         }
@@ -106,8 +106,8 @@ class DecosTaxi(DecosBase):
         odata_select.add_fields([str(p.value) for p in DecosParams])
         filters = [{"_eq": {DecosParams.bsn.value, driver_bsn}}]
         parameters = {
-            "properties": False,
-            "fetchParents": False,
+            "properties": "false",
+            "fetchParents": "false",
             "oDataQuery.select": odata_select.parse(),
             "oDataQuery.filter": odata_filter.parse(filters),
         }
@@ -131,8 +131,8 @@ class DecosTaxi(DecosBase):
         odata_select = OdataSelectParser()
         odata_select.add_fields([str(p.value) for p in DecosParams])
         parameters = {
-            "properties": False,
-            "fetchParents": False,
+            "properties": "false",
+            "fetchParents": "false",
             "relTypeKey": license_casenr,
             "oDataQuery.select": odata_select.parse(),
         }

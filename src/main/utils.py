@@ -1,4 +1,6 @@
 import logging
+import urllib
+from urllib.parse import quote
 from datetime import timedelta
 
 import requests
@@ -20,7 +22,8 @@ class DecosBase:
         Generate a get requests for the given Url and parameters
         """
         try:
-            response = self._get_response(parameters, url)
+            parsed_params = urllib.parse.urlencode(parameters, quote_via=urllib.parse.quote)
+            response = self._get_response(params=parsed_params, url=url)
             # TODO: account for pagination in the decos join api
             response.raise_for_status()
         except RequestException as e:
@@ -29,12 +32,12 @@ class DecosBase:
             raise ImmediateHttpResponse(response=HttpResponse(
                 "We got an error response from Decos Join", status=502))
 
-        return response
+        return response.json()
 
-    def _get_response(self, parameters, url):
+    def _get_response(self, params, url):
         response = requests.get(
             url,
-            params=parameters,
+            params=params,
             auth=(self.auth_user, self.auth_pass),
             headers={'accept': 'application/itemdata'},
             timeout=5,

@@ -1,7 +1,7 @@
 import logging
 
 from braces.views import CsrfExemptMixin
-
+from django.http import HttpRequest
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -22,9 +22,10 @@ class PermitView(CsrfExemptMixin, APIView):
         request_body=BsnRequestSerializer,
         responses={200: BsnRequestResponseSerializer},  # TODO:Define more responses here
     )
-    def post(self, request):
+    def post(self, request: HttpRequest):
         """
-
+        Create a proxy request to decos for the taxi permits with the drivers
+        bsn nr
         """
         serializer = BsnRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

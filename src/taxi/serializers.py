@@ -14,7 +14,7 @@ class OntheffingSerializer(serializers.Serializer):
 
 
 class OntheffingResponseSerializer(serializers.Serializer):
-    permist = OntheffingSerializer(many=True)
+    ontheffing = OntheffingSerializer(many=True)
 
 
 # Serializers voor ontheffingen

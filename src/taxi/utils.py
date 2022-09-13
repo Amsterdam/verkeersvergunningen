@@ -18,13 +18,13 @@ class DecosTaxi(DecosBase):
         "HANDHAVINGSZAKEN": settings.TAXI_HANDHAVINGSZAKEN_ZAAKNUMMER,  # Enforcement cases
     }
 
-    def get_taxi_zone_ontheffing(self, driver_bsn: str) -> list[str]:
+    def get_taxi_zone_ontheffing(self, driver_bsn: str) -> list[dict]:
         """
         request the permit from a driver based on their bsn nr
         """
         decos_key = self.get_driver_decos_key(driver_bsn)
         driver_permits = self.get_driver_ontheffing_en_handhaving(decos_key)
-        return driver_permits
+        return [{'vergunningsnummer': p} for p in driver_permits]
 
     def get_driver_decos_key(self, driver_bsn: str) -> str:
         """
@@ -90,35 +90,6 @@ class DecosTaxi(DecosBase):
         driver_permits = self._parse_key(response)
         return driver_permits
 
-    def get_driver_ontheffing(self, driver_bsn: str) -> list[str]:
-        """
-        get the permits from the driver based on the drivers key
-        """
-
-        class DecosParams(Enum):
-            bsn = "NUM2"
-            resultaat = "DFUNCTION"
-            ingangsdatum_ontheffing = "DATE6"
-            vervaldatum_ontheffing = "DATE7"
-
-        odata_select = OdataSelectParser()
-        odata_filter = OdataFilterParser()
-        odata_select.add_fields([str(p.value) for p in DecosParams])
-        filters = [{"_eq": {DecosParams.bsn.value, driver_bsn}}]
-        parameters = {
-            "properties": "false",
-            "fetchParents": "false",
-            "oDataQuery.select": odata_select.parse(),
-            "oDataQuery.filter": odata_filter.parse(filters),
-        }
-        url = self._build_url(
-            zaaknummer=self.ZAAKNUMMER["ZONE_ONTHEFFING"],
-            endpoint=DecosBusiness.folders.value,
-        )
-        data = self._get(url, parameters)
-        driver_exemptions = self._parse_key(data)
-        return driver_exemptions
-
     def get_handhavingzaken(self, permit_decos_key: str) -> list[str]:
         """
         get the cases from the driver based on the drivers key
@@ -141,8 +112,7 @@ class DecosTaxi(DecosBase):
             endpoint=DecosBusiness.folders.value,
         )
         data = self._get(url, parameters)
-        cases = self._parse_key(data)
-        return cases
+        return data
 
     def _parse_key(self, data: dict) -> list[str]:
         """

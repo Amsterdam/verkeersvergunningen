@@ -4,7 +4,7 @@ import json
 import pytest
 from dateutil.parser import parse
 from django.conf import settings
-from .utils import MockResponse
+from tests.utils import MockResponse
 
 from tests.utils import MockResponse
 from zwaarverkeer.utils import DecosZwaarverkeer
@@ -17,9 +17,6 @@ def create_basic_auth_headers(username, password):
 
 
 class TestDecosZwaarverkeer:
-    def setup(self):
-        pass
-
     @pytest.mark.parametrize(
         'passage_at, permit_type, valid_from, valid_until, expected_valid_from, expected_valid_until',
         [
@@ -287,14 +284,12 @@ class TestDecosZwaarverkeer:
 
 
 class TestVerkeersvergunningen:
-    def setup(self):
-        self.URL = '/zwaarverkeer/get_permits/'
-        self.test_payload = {'number_plate': '1234AB', 'passage_at': '2022-10-10T06:30:00.000'}
-
-        self.auth_headers = create_basic_auth_headers(
-            settings.CLEOPATRA_BASIC_AUTH_USER,
-            settings.CLEOPATRA_BASIC_AUTH_PASS
-        )
+    URL = '/zwaarverkeer/get_permits/'
+    test_payload = {'number_plate': '1234AB', 'passage_at': '2022-10-10T06:30:00.000'}
+    auth_headers = create_basic_auth_headers(
+        settings.CLEOPATRA_BASIC_AUTH_USER,
+        settings.CLEOPATRA_BASIC_AUTH_PASS
+    )
 
     @pytest.mark.parametrize(
         'passage_at, expected_passage_at',

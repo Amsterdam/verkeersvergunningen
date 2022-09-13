@@ -6,7 +6,8 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from taxi.serializers import OntheffingRequestSerializer, OntheffingResponseSerializer, HandhavingResponseSerializer
+from taxi.serializers import OntheffingRequestSerializer, \
+    OntheffingResponseSerializer, HandhavingResponseSerializer
 from main.authentication import BasicAuthWithKeys
 from main.utils import ImmediateHttpResponse
 from taxi.utils import DecosTaxi
@@ -35,7 +36,8 @@ class OntheffingView(CsrfExemptMixin, APIView):
         try:
             decos = DecosTaxi()
             data = decos.get_taxi_zone_ontheffing(bsn)
-            response_serializer = OntheffingResponseSerializer(data=data)
+            response_serializer = \
+                OntheffingResponseSerializer(data={'ontheffing': data})
             response_serializer.is_valid(raise_exception=True)
             return Response(response_serializer.data)
 
@@ -47,17 +49,15 @@ class OntheffingView(CsrfExemptMixin, APIView):
 
 class HandhavingView(CsrfExemptMixin, APIView):
     http_method_names = ['get']
-    authentication_classes = [BasicAuthWithKeys]
+    # authentication_classes = [BasicAuthWithKeys]
 
     @swagger_auto_schema(
         responses={200: HandhavingResponseSerializer},  # TODO:Define more responses here
     )
-    def post(self, request):
+    def get(self, request, ontheffingsnummer: str):
         """
-
+        create a proxy request to decos to query the "handhavingen" permits
         """
-        ontheffingsnummer = self.kwargs.get('ontheffingsnummer')
-
         try:
             decos = DecosTaxi()
             return Response(data=decos.get_handhavingzaken(ontheffingsnummer))

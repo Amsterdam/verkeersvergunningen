@@ -122,9 +122,14 @@ class TestDecosTaxi:
     def test_get_enforcement_cases(self, decos):
         license_casenr = "fake"
         cases = decos.get_handhavingzaken(license_casenr)
-        assert ["0987654", "12345678"] == cases
+        assert {
+                "content": [
+                    {"key": "0987654", "some_other": "data"},
+                    {"key": "12345678"},
+                ]
+            } == cases
 
-    @patch("taxi.utils.DecosTaxi.get_decos_key", lambda *args, **kwargs: "fake_758697")
+    @patch("taxi.utils.DecosTaxi.get_driver_decos_key", lambda *args, **kwargs: "fake_758697")
     @patch(
         "taxi.utils.DecosTaxi._get_response",
         lambda *args, **kwargs: MockResponse(
@@ -140,4 +145,4 @@ class TestDecosTaxi:
     def test_get_taxi_permit(self, decos):
         bsn = "bsn_fake"
         driver_permits = decos.get_taxi_zone_ontheffing(bsn)
-        assert ["abcd12346", "12345678abc"] == driver_permits
+        assert [{'vergunningsnummer': 'abcd12346'}, {'vergunningsnummer': '12345678abc'}] == driver_permits

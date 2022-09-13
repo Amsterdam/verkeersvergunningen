@@ -1,3 +1,6 @@
+from tests.utils import MockResponse
+
+
 def mock_zaaknummer():
     return {
         "count": 1,

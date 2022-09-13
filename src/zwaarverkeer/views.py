@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from main.authentication import BasicAuthWithKeys
-from zwaarverkeer.serializers import PermitRequestSerializer, PermitsResponseSerializer
+from zwaarverkeer.serializers import PermitsRequestSerializer, PermitsResponseSerializer
 from zwaarverkeer.utils import DecosZwaarverkeer
 from main.utils import ImmediateHttpResponse
 
@@ -20,11 +20,11 @@ class PermitView(CsrfExemptMixin, APIView):
     authentication_classes = [BasicAuthWithKeys]
 
     @swagger_auto_schema(
-        request_body=PermitRequestSerializer,
+        request_body=PermitsRequestSerializer,
         responses={200: PermitsResponseSerializer},  # TODO:Define more responses here
     )
     def post(self, request):
-        request_serializer = PermitRequestSerializer(data=request.data)
+        request_serializer = PermitsRequestSerializer(data=request.data)
         request_serializer.is_valid(raise_exception=True)
 
         number_plate = request.data['number_plate'].upper()

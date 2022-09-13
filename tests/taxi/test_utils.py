@@ -52,7 +52,7 @@ class TestDecosTaxi:
         mocker.patch("taxi.utils.DecosTaxi._get_response", return_value=mock_response)
 
         # Run code
-        decos_key = decos.get_decos_key(driver_bsn=BSN_NUM)
+        decos_key = decos.get_driver_decos_key(driver_bsn=BSN_NUM)
 
         # Check if the prepared url is correct
         mocked_response_function = taxi.utils.DecosTaxi._get_response
@@ -76,7 +76,7 @@ class TestDecosTaxi:
     )
     def test_get_driver_permits_simple(self, decos):
         driver_decos_key = "1234567"
-        permits = decos.get_driver_permits(driver_decos_key)
+        permits = decos.get_driver_ontheffing_en_handhaving(driver_decos_key)
         assert ["0987654", "12345678"] == permits
 
     def test_get_driver_permits_extensive(self, mocker, decos):
@@ -97,7 +97,7 @@ class TestDecosTaxi:
         mock_response = MockResponse(200, json_content=decos_response)
         mocker.patch("taxi.utils.DecosTaxi._get_response", return_value=mock_response)
 
-        permits = decos.get_driver_permits(driver_decos_key=DECOS_KEY)
+        permits = decos.get_driver_ontheffing_en_handhaving(driver_decos_key=DECOS_KEY)
 
         # Check if the prepared url is correct
         mocked_response_function = taxi.utils.DecosTaxi._get_response
@@ -121,7 +121,7 @@ class TestDecosTaxi:
     )
     def test_get_enforcement_cases(self, decos):
         license_casenr = "fake"
-        cases = decos.get_enforcement_cases(license_casenr)
+        cases = decos.get_handhavingzaken(license_casenr)
         assert ["0987654", "12345678"] == cases
 
     @patch("taxi.utils.DecosTaxi.get_decos_key", lambda *args, **kwargs: "fake_758697")
@@ -139,5 +139,5 @@ class TestDecosTaxi:
     )
     def test_get_taxi_permit(self, decos):
         bsn = "bsn_fake"
-        driver_permits = decos.get_taxi_permit(bsn)
+        driver_permits = decos.get_taxi_zone_ontheffing(bsn)
         assert ["abcd12346", "12345678abc"] == driver_permits

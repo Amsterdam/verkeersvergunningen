@@ -14,19 +14,19 @@ class DecosBusiness(Enum):
 class DecosTaxi(DecosBase):
     ZAAKNUMMER = {
         "BSN": settings.TAXI_BSN_ZAAKNUMMER,
-        "ZONE_ONTHEFFING": settings.TAXI_ZONE_ONTHEFFING_ZAAKNUMMER,
-        "HANDHAVINGSZAKEN": settings.TAXI_HANDHAVINGSZAKEN_ZAAKNUMMER,
+        "ZONE_ONTHEFFING": settings.TAXI_ZONE_ONTHEFFING_ZAAKNUMMER,  # Permits
+        "HANDHAVINGSZAKEN": settings.TAXI_HANDHAVINGSZAKEN_ZAAKNUMMER,  # Enforcement cases
     }
 
-    def get_taxi_permit(self, bsn: str):
+    def get_taxi_zone_ontheffing(self, driver_bsn: str) -> list[str]:
         """
         request the permit from a driver based on their bsn nr
         """
-        decos_key = self.get_decos_key(bsn)
-        driver_permits = self.get_driver_permits(decos_key)
+        decos_key = self.get_driver_decos_key(driver_bsn)
+        driver_permits = self.get_driver_ontheffing_en_handhaving(decos_key)
         return driver_permits
 
-    def get_decos_key(self, driver_bsn: str) -> str:
+    def get_driver_decos_key(self, driver_bsn: str) -> str:
         """
         Request the decos key from decosdvl for a driver based on their bsn nr
         """
@@ -54,7 +54,7 @@ class DecosTaxi(DecosBase):
             raise ImmediateHttpResponse("Error finding decos_key for that BSN")
         return zaaknummers[0]
 
-    def get_driver_permits(self, driver_decos_key: str) -> list[str]:
+    def get_driver_ontheffing_en_handhaving(self, driver_decos_key: str) -> list[str]:
         """
         get the documents from the driver based on the drivers key
         """
@@ -90,7 +90,7 @@ class DecosTaxi(DecosBase):
         driver_permits = self._parse_key(response)
         return driver_permits
 
-    def get_driver_exemption(self, driver_bsn: str) -> list[str]:
+    def get_driver_ontheffing(self, driver_bsn: str) -> list[str]:
         """
         get the permits from the driver based on the drivers key
         """
@@ -119,7 +119,7 @@ class DecosTaxi(DecosBase):
         driver_exemptions = self._parse_key(data)
         return driver_exemptions
 
-    def get_enforcement_cases(self, license_casenr: str) -> list[str]:
+    def get_handhavingzaken(self, permit_decos_key: str) -> list[str]:
         """
         get the cases from the driver based on the drivers key
         """
@@ -133,7 +133,7 @@ class DecosTaxi(DecosBase):
         parameters = {
             "properties": "false",
             "fetchParents": "false",
-            "relTypeKey": license_casenr,
+            "relTypeKey": permit_decos_key,
             "oDataQuery.select": odata_select.parse(),
         }
         url = self._build_url(

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 
-class PermitRequestSerializer(serializers.Serializer):
+class PermitsRequestSerializer(serializers.Serializer):
     number_plate = serializers.CharField(min_length=6, max_length=6)
     passage_at = serializers.DateTimeField()
 

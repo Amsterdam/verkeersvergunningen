@@ -24,7 +24,7 @@ schema_view = get_schema_view(
    openapi.Info(
       title="Verkeersvergunningen API",
       default_version='v1',
-      description="An API to get the verkeersvergunningen. Currently only for zwaar verkeer.",
+      description="API om verkeersvergunningen te verzamelen voor taxi's en zwaarverkeer",
       license=openapi.License(name="Mozilla Public License Version 2.0"),
    ),
    public=True,

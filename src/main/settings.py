@@ -49,6 +49,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'drf_yasg',
+    'taxi',
+    'zwaarverkeer',
+    'health',
 ]
 
 MIDDLEWARE = [

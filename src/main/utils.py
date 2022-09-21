@@ -26,6 +26,8 @@ class DecosBase:
             response = self._get_response(params=parsed_params, url=url)
             # TODO: account for pagination in the decos join api
             response.raise_for_status()
+        except requests.exceptions.ReadTimeout:
+            raise ImmediateHttpResponse(response=HttpResponse("Timeout trying to fetch data from Decos", status=504))
         except RequestException as e:
             log.error(f"We got an {e.response.status_code} "
                       f"error from Decos Join saying: {e.response.content}")

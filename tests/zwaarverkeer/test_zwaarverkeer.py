@@ -387,7 +387,7 @@ class TestVerkeersvergunningen:
         assert response.status_code == 502
 
     def test_decos_timeout(self, client, mocker):
-        mocker.patch('zwaarverkeer.views.DecosJoin._do_request', side_effect=requests.exceptions.ReadTimeout)
+        mocker.patch('zwaarverkeer.views.DecosZwaarverkeer._get_response', side_effect=requests.exceptions.ReadTimeout)
 
         response = client.post(
             self.URL,

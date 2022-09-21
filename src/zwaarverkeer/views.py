@@ -1,8 +1,9 @@
 import logging
 
+import requests
 from braces.views import CsrfExemptMixin
 from dateutil import parser
-
+from django.http import HttpResponse
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -45,5 +46,7 @@ class PermitView(CsrfExemptMixin, APIView):
 
         except ImmediateHttpResponse as e:
             return e.response
+        except requests.exceptions.ReadTimeout:
+            return HttpResponse(status=504)
         # TODO: also catch validation exception
         # TODO: test whether this also works with drf exception handling

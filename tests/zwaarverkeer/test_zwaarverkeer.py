@@ -2,6 +2,7 @@ import base64
 import json
 
 import pytest
+import requests
 from dateutil.parser import parse
 from django.conf import settings
 from tests.utils import MockResponse
@@ -384,6 +385,17 @@ class TestVerkeersvergunningen:
             **self.auth_headers
         )
         assert response.status_code == 502
+
+    def test_decos_timeout(self, client, mocker):
+        mocker.patch('zwaarverkeer.views.DecosJoin._do_request', side_effect=requests.exceptions.ReadTimeout)
+
+        response = client.post(
+            self.URL,
+            json.dumps(self.test_payload),
+            content_type='application/json',
+            **self.auth_headers
+        )
+        assert response.status_code == 504
 
     def test_invalid_json(self, client):
         response = client.post(

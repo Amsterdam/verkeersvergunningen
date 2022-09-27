@@ -19,8 +19,8 @@ def force_auth(*args, **kwargs):
 
 @patch("main.authentication.BasicAuthWithKeys.authenticate", force_auth)
 class TestUrls:
-    @patch("taxi.utils.DecosTaxi.get_driver_decos_key", lambda *args, **kwargs: "bsn_fake_1234567")
-    @patch("taxi.utils.DecosTaxi.get_driver_ontheffing_en_handhaving", lambda *args, **kwargs: ["permit_fake_12345"])
+    @patch("taxi.decos.DecosTaxi.get_driver_decos_key", lambda *args, **kwargs: "bsn_fake_1234567")
+    @patch("taxi.decos.DecosTaxi.get_driver_ontheffing_en_handhaving", lambda *args, **kwargs: ["permit_fake_12345"])
     def test_ontheffingen(self, client):
         data = {"bsn": 12345678}
         url = reverse("taxi_ontheffing")
@@ -29,7 +29,7 @@ class TestUrls:
         assert "vergunningsnummer" in response.data["ontheffing"][0]
         assert response.data["ontheffing"][0]["vergunningsnummer"] == "permit_fake_12345"
 
-    @patch("taxi.utils.DecosTaxi._get_response", lambda *args, **kwargs: MockResponse(200, mock_handhavingszaken()))
+    @patch("taxi.decos.DecosTaxi._get_response", lambda *args, **kwargs: MockResponse(200, mock_handhavingszaken()))
     def test_get_handhaving_endpoint(self, client):
         kwargs = {"ontheffingsnummer": "123456ab"}
         url = reverse("taxi_handhaving", kwargs=kwargs)

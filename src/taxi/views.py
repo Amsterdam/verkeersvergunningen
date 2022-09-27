@@ -9,8 +9,8 @@ from rest_framework.views import APIView
 from taxi.serializers import OntheffingRequestSerializer, \
     OntheffingResponseSerializer, HandhavingResponseSerializer
 from main.authentication import BasicAuthWithKeys
-from main.utils import ImmediateHttpResponse
-from taxi.utils import DecosTaxi
+from main.exceptions import ImmediateHttpResponse
+from taxi.decos import DecosTaxi
 
 log = logging.getLogger(__name__)
 
@@ -49,7 +49,7 @@ class OntheffingView(CsrfExemptMixin, APIView):
 
 class HandhavingView(CsrfExemptMixin, APIView):
     http_method_names = ['get']
-    # authentication_classes = [BasicAuthWithKeys]
+    authentication_classes = [BasicAuthWithKeys]
 
     @swagger_auto_schema(
         responses={200: HandhavingResponseSerializer},  # TODO:Define more responses here

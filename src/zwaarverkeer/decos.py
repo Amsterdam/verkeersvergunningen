@@ -8,7 +8,7 @@ from django.conf import settings
 from django.utils import timezone
 from odata_request_parser.main import OdataSelectParser, OdataFilterParser
 
-from main.utils import DecosBase
+from main.decos import DecosBase
 
 log = logging.getLogger(__name__)
 
@@ -96,4 +96,15 @@ class DecosZwaarverkeer(DecosBase):
         if 'dagontheffing' in permit_type.lower():
             valid_until = valid_until.replace(hour=6, minute=0, second=0)
         return valid_until
+
+    def _get_date_strings(self, passage_at):
+        """
+        Get the date string from the passage_at and create a valid from/until
+        """
+        valid_from = passage_at.date().isoformat()
+        # Day permits are valid from 00:00 until 06:00 the day after.
+        # So we also get the permits from the day before.
+        # That way we can loop over them and check whether they are day permits and if so they are also valid
+        valid_until = (passage_at.date() - timedelta(days=1)).isoformat()
+        return valid_from, valid_until
 

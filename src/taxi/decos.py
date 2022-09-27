@@ -3,7 +3,7 @@ from enum import Enum
 from django.conf import settings
 from odata_request_parser.main import OdataFilterParser, OdataSelectParser
 
-from main.utils import DecosBase, ImmediateHttpResponse
+from main.decos import DecosBase, ImmediateHttpResponse
 
 
 class DecosBusiness(Enum):

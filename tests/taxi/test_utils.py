@@ -5,10 +5,10 @@ import pytest
 from unittest.mock import patch
 
 import taxi
-from main.utils import ImmediateHttpResponse
+from main.exceptions import ImmediateHttpResponse
 from .mock_data import mock_zaaknummer
 
-from taxi.utils import DecosTaxi
+from taxi.decos import DecosTaxi
 from ..utils import MockResponse
 
 
@@ -49,13 +49,13 @@ class TestDecosTaxi:
             "content": [{"key": DECOS_KEY, "fields": {"num1": int(BSN_NUM)}}]
         }
         mock_response = MockResponse(200, json_content=decos_response)
-        mocker.patch("taxi.utils.DecosTaxi._get_response", return_value=mock_response)
+        mocker.patch("taxi.decos.DecosTaxi._get_response", return_value=mock_response)
 
         # Run code
         decos_key = decos.get_driver_decos_key(driver_bsn=BSN_NUM)
 
         # Check if the prepared url is correct
-        mocked_response_function = taxi.utils.DecosTaxi._get_response
+        mocked_response_function = taxi.decos.DecosTaxi._get_response
         call_args_kwargs = mocked_response_function.call_args.kwargs
         r = Request(**call_args_kwargs).prepare()
         assert r.url == expected_request_url
@@ -63,7 +63,7 @@ class TestDecosTaxi:
         assert decos_key == DECOS_KEY
 
     @patch(
-        "taxi.utils.DecosTaxi._get_response",
+        "taxi.decos.DecosTaxi._get_response",
         lambda *args, **kwargs: MockResponse(
             200,
             {
@@ -95,12 +95,12 @@ class TestDecosTaxi:
             ]
         }
         mock_response = MockResponse(200, json_content=decos_response)
-        mocker.patch("taxi.utils.DecosTaxi._get_response", return_value=mock_response)
+        mocker.patch("taxi.decos.DecosTaxi._get_response", return_value=mock_response)
 
         permits = decos.get_driver_ontheffing_en_handhaving(driver_decos_key=DECOS_KEY)
 
         # Check if the prepared url is correct
-        mocked_response_function = taxi.utils.DecosTaxi._get_response
+        mocked_response_function = taxi.decos.DecosTaxi._get_response
         call_args_kwargs = mocked_response_function.call_args.kwargs
         r = Request(**call_args_kwargs).prepare()
         assert r.url == expected_request_url
@@ -108,7 +108,7 @@ class TestDecosTaxi:
         assert permits == [PERMIT_1, PERMIT_2]
 
     @patch(
-        "taxi.utils.DecosTaxi._get_response",
+        "taxi.decos.DecosTaxi._get_response",
         lambda *args, **kwargs: MockResponse(
             200,
             {
@@ -129,9 +129,9 @@ class TestDecosTaxi:
                 ]
             } == cases
 
-    @patch("taxi.utils.DecosTaxi.get_driver_decos_key", lambda *args, **kwargs: "fake_758697")
+    @patch("taxi.decos.DecosTaxi.get_driver_decos_key", lambda *args, **kwargs: "fake_758697")
     @patch(
-        "taxi.utils.DecosTaxi._get_response",
+        "taxi.decos.DecosTaxi._get_response",
         lambda *args, **kwargs: MockResponse(
             200,
             {

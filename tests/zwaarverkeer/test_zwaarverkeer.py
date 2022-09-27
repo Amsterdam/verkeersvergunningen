@@ -8,7 +8,7 @@ from django.conf import settings
 from tests.utils import MockResponse
 
 from tests.utils import MockResponse
-from zwaarverkeer.utils import DecosZwaarverkeer
+from zwaarverkeer.decos import DecosZwaarverkeer
 
 
 def create_basic_auth_headers(username, password):

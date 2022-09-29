@@ -13,8 +13,8 @@ class DecosFolders(Enum):
 
 class DecosZaaknummers(Enum):
     """
-    An enforcement case is withdrawal of a permit, so if there is a permit and an
-        enforcement case for it is invalidated
+    An enforcement case is a withdrawal of a permit, so if there is a permit and an
+    enforcement case for that permit, the permit is invalidated
     """
     bsn: str = settings.TAXI_BSN_ZAAKNUMMER
     zone_ontheffing: str = settings.TAXI_ZONE_ONTHEFFING_ZAAKNUMMER  # Permits

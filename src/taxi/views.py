@@ -56,7 +56,8 @@ class HandhavingView(CsrfExemptMixin, APIView):
     )
     def get(self, request, ontheffingsnummer: str):
         """
-        create a proxy request to decos to query the "handhavingen" permits
+        create a proxy request to decos to query the 'handhavingen' permits
+        Based on the 'ontheffingsnummer' retrieve all the 'handhavingen'
         """
         try:
             decos = DecosTaxi()

@@ -8,7 +8,7 @@ import taxi
 from main.exceptions import ImmediateHttpResponse
 from .mock_data import mock_zaaknummer
 
-from taxi.decos import DecosTaxi
+from taxi.decos import DecosTaxi, DecosZaaknummers
 from ..utils import MockResponse
 
 
@@ -40,7 +40,8 @@ class TestDecosTaxi:
             decos._parse_key(data)
 
     def test_get_decos_key(self, mocker, decos):
-        DECOS_KEY = DecosTaxi.ZAAKNUMMER["BSN"]
+
+        DECOS_KEY = DecosZaaknummers.bsn.value
         BSN_NUM = "233090125"
         expected_request_url = f"https://decosdvl.acc.amsterdam.nl/decosweb/aspx/api/v1/items/{DECOS_KEY}/TAXXXI" \
                                f"?properties=false&fetchParents=false" \

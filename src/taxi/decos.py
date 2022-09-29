@@ -6,17 +6,22 @@ from odata_request_parser.main import OdataFilterParser, OdataSelectParser
 from main.decos import DecosBase, ImmediateHttpResponse
 
 
-class DecosBusiness(Enum):
+class DecosFolders(Enum):
     taxi = "TAXXXI"
-    folders = "FOLDERS"
+    folders = "FOLDERS" # This may seem counterintuitive but a folder is called 'Folders'
+
+
+class DecosZaaknummers(Enum):
+    """
+    An enforcement case is withdrawal of a permit, so if there is a permit and an
+        enforcement case for it is invalidated
+    """
+    bsn: str = settings.TAXI_BSN_ZAAKNUMMER
+    zone_ontheffing: str = settings.TAXI_ZONE_ONTHEFFING_ZAAKNUMMER  # Permits
+    handhavingszaken: str = settings.TAXI_HANDHAVINGSZAKEN_ZAAKNUMMER  # Enforcement cases
 
 
 class DecosTaxi(DecosBase):
-    ZAAKNUMMER = {
-        "BSN": settings.TAXI_BSN_ZAAKNUMMER,
-        "ZONE_ONTHEFFING": settings.TAXI_ZONE_ONTHEFFING_ZAAKNUMMER,  # Permits
-        "HANDHAVINGSZAKEN": settings.TAXI_HANDHAVINGSZAKEN_ZAAKNUMMER,  # Enforcement cases
-    }
 
     def get_taxi_zone_ontheffing(self, driver_bsn: str) -> list[dict]:
         """
@@ -33,7 +38,6 @@ class DecosTaxi(DecosBase):
 
         class DecosParams(Enum):
             bsn = "NUM1"
-            a_nummer = "TEXT13"
 
         odata_filter = OdataFilterParser()
         filters = [{"_eq": {DecosParams.bsn.value: driver_bsn}}]
@@ -45,8 +49,8 @@ class DecosTaxi(DecosBase):
         }
 
         url = self._build_url(
-            zaaknummer=self.ZAAKNUMMER.get("BSN"),
-            endpoint=DecosBusiness.taxi.value,
+            zaaknummer=DecosZaaknummers.bsn.value,
+            endpoint=DecosFolders.taxi.value,
         )
         data = self._get(url, parameters)
         zaaknummers = self._parse_key(data)
@@ -84,7 +88,7 @@ class DecosTaxi(DecosBase):
             "oDataQuery.filter": odata_filter.parse(filters),
         }
         url = self._build_url(
-            zaaknummer=driver_decos_key, endpoint=DecosBusiness.folders.value
+            zaaknummer=driver_decos_key, endpoint=DecosFolders.folders.value
         )
         response = self._get(url, parameters)
         driver_permits = self._parse_key(response)
@@ -108,8 +112,8 @@ class DecosTaxi(DecosBase):
             "oDataQuery.select": odata_select.parse(),
         }
         url = self._build_url(
-            zaaknummer=self.ZAAKNUMMER["HANDHAVINGSZAKEN"],
-            endpoint=DecosBusiness.folders.value,
+            zaaknummer=DecosZaaknummers.handhavingszaken.value,
+            endpoint=DecosFolders.folders.value,
         )
         data = self._get(url, parameters)
         return data

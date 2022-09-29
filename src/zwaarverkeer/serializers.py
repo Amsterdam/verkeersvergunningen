@@ -9,8 +9,8 @@ class PermitsRequestSerializer(serializers.Serializer):
 class PermitSerializer(serializers.Serializer):
     permit_type = serializers.CharField(required=False, allow_null=True)
     permit_description = serializers.CharField(required=False)
-    valid_from = serializers.DateTimeField(required=True)  # (required=False, allow_null=True)
-    valid_until = serializers.DateTimeField(required=True)    # (required=False, allow_null=True)
+    valid_from = serializers.DateTimeField(required=True)
+    valid_until = serializers.DateTimeField(required=True)
 
 
 class PermitsResponseSerializer(serializers.Serializer):

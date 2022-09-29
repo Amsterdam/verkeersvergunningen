@@ -46,7 +46,3 @@ class PermitView(CsrfExemptMixin, APIView):
 
         except ImmediateHttpResponse as e:
             return e.response
-        except requests.exceptions.ReadTimeout:
-            return HttpResponse(status=504)
-        # TODO: also catch validation exception
-        # TODO: test whether this also works with drf exception handling

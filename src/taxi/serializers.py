@@ -5,27 +5,22 @@ from rest_framework import serializers
 log = logging.getLogger(__name__)
 
 
-class OntheffingRequestSerializer(serializers.Serializer):
+class OntheffingenRequestSerializer(serializers.Serializer):
     bsn = serializers.IntegerField()
 
 
-class OntheffingSerializer(serializers.Serializer):
-    vergunningsnummer = serializers.CharField()
-
-
-class OntheffingResponseSerializer(serializers.Serializer):
-    ontheffing = OntheffingSerializer(many=True)
-
-
-# Serializers voor ontheffingen
-class SchorsingenSerializer(serializers.Serializer):
+class HandhavingSerializer(serializers.Serializer):
     zaakidentificatie = serializers.CharField(max_length=40)
-    geldigVanaf = serializers.DateField()
-    geldigTot = serializers.DateField()
+    geldigVanaf = serializers.DateTimeField()
+    geldigTot = serializers.DateTimeField()
 
 
-class HandhavingResponseSerializer(serializers.Serializer):
-    ontheffingnummer = serializers.CharField(max_length=40)
-    geldigVanaf = serializers.DateField()
-    geldigTot = serializers.DateField()
-    schorsingen = SchorsingenSerializer(many=True)
+class OntheffingDetailResponseSerializer(serializers.Serializer):
+    zaakidentificatie = serializers.CharField(max_length=40)
+    geldigVanaf = serializers.DateTimeField()
+    geldigTot = serializers.DateTimeField()
+    schorsingen = HandhavingSerializer(many=True)
+
+
+class OntheffingenResponseSerializer(serializers.Serializer):
+    ontheffing = OntheffingDetailResponseSerializer(many=True)

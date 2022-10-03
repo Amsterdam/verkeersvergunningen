@@ -15,10 +15,7 @@ log = logging.getLogger(__name__)
 
 
 class DecosBase:
-    def __init__(self):
-        self.base_url = settings.DECOS_BASE_URL
-        self.auth_user = settings.DECOS_BASIC_AUTH_USER
-        self.auth_pass = settings.DECOS_BASIC_AUTH_PASS
+    base_url = settings.DECOS_BASE_URL
 
     def _get(self, url, parameters=None):
         """

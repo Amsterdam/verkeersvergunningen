@@ -24,6 +24,8 @@ class DecosParams(Enum):
 
 
 class DecosZwaarverkeer(DecosBase):
+    auth_user = settings.DECOS_BASIC_AUTH_USER
+    auth_pass = settings.DECOS_BASIC_AUTH_PASS
     zwaar_verkeer_zaaknr = settings.ZWAAR_VERKEER_ZAAKNUMMER
 
     def get_permits(self, *, number_plate, passage_at):

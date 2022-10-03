@@ -8,7 +8,8 @@ import taxi
 from main.exceptions import ImmediateHttpResponse
 from .mock_data import mock_zaaknummer, mock_permits
 
-from taxi.decos import DecosTaxi, DecosZaaknummers, PermitParams
+from taxi.decos import DecosTaxi
+from taxi.enums import DecosZaaknummers, PermitParams
 from ..utils import MockResponse
 
 

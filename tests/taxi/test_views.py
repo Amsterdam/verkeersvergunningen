@@ -6,7 +6,7 @@ from rest_framework.test import APIClient
 import pytest
 from tests.utils import MockResponse
 from .mock_data import mock_handhavingszaken
-from taxi.decos import PermitParams
+from taxi.enums import PermitParams
 
 
 @pytest.fixture

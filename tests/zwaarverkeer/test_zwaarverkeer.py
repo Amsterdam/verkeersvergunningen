@@ -5,19 +5,10 @@ import pytest
 import requests
 from dateutil.parser import parse
 from django.conf import settings
+from tests.utils import MockResponse
 
-from zwaarverkeer.decos_join import DecosJoin
-
-
-class MockResponse:
-    def __init__(self, status_code, json_content=None, content=None, headers=None):
-        self.status_code = status_code
-        self.json_content = json_content
-        self.content = content
-        self.headers = headers
-
-    def json(self):
-        return self.json_content
+from tests.utils import MockResponse
+from zwaarverkeer.decos import DecosZwaarverkeer
 
 
 def create_basic_auth_headers(username, password):
@@ -26,10 +17,7 @@ def create_basic_auth_headers(username, password):
     return {'HTTP_AUTHORIZATION': auth_string}
 
 
-class TestDecosJoin:
-    def setup(self):
-        pass
-
+class TestDecosZwaarverkeer:
     @pytest.mark.parametrize(
         'passage_at, permit_type, valid_from, valid_until, expected_valid_from, expected_valid_until',
         [
@@ -110,10 +98,10 @@ class TestDecosJoin:
             ]
         }
         mock_response = MockResponse(200, json_content=decos_response)
-        mocker.patch('zwaarverkeer.views.DecosJoin._do_request', return_value=mock_response)
+        mocker.patch('zwaarverkeer.views.DecosZwaarverkeer._get_response', return_value=mock_response)
 
-        decos = DecosJoin()
-        result = decos.get_permits('ABC123', parse(passage_at))
+        decos = DecosZwaarverkeer()
+        result = decos.get_permits(number_plate='ABC123', passage_at=parse(passage_at))
         expected = []
         if expected_valid_from:
             expected.append({
@@ -279,10 +267,10 @@ class TestDecosJoin:
             }
             decos_response['content'].append(permit_dict)
         mock_response = MockResponse(200, json_content=decos_response)
-        mocker.patch('zwaarverkeer.views.DecosJoin._do_request', return_value=mock_response)
+        mocker.patch('zwaarverkeer.views.DecosZwaarverkeer._get_response', return_value=mock_response)
 
-        decos = DecosJoin()
-        result = decos.get_permits('ABC123', parse(passage_at))
+        decos = DecosZwaarverkeer()
+        result = decos.get_permits(number_plate='ABC123', passage_at=parse(passage_at))
         expected = []
         for permit_info in permits:
             expected_permit = {
@@ -297,14 +285,12 @@ class TestDecosJoin:
 
 
 class TestVerkeersvergunningen:
-    def setup(self):
-        self.URL = '/zwaarverkeer/get_permits/'
-        self.test_payload = {'number_plate': '1234AB', 'passage_at': '2022-10-10T06:30:00.000'}
-
-        self.auth_headers = create_basic_auth_headers(
-            settings.CLEOPATRA_BASIC_AUTH_USER,
-            settings.CLEOPATRA_BASIC_AUTH_PASS
-        )
+    URL = '/zwaarverkeer/get_permits/'
+    test_payload = {'number_plate': '1234AB', 'passage_at': '2022-10-10T06:30:00.000'}
+    auth_headers = create_basic_auth_headers(
+        settings.CLEOPATRA_BASIC_AUTH_USER,
+        settings.CLEOPATRA_BASIC_AUTH_PASS
+    )
 
     @pytest.mark.parametrize(
         'passage_at, expected_passage_at',
@@ -328,7 +314,7 @@ class TestVerkeersvergunningen:
             ]
         }
         mock_response = MockResponse(200, json_content=decos_response)
-        mocker.patch('zwaarverkeer.views.DecosJoin._do_request', return_value=mock_response)
+        mocker.patch('zwaarverkeer.views.DecosZwaarverkeer._get_response', return_value=mock_response)
 
         payload = self.test_payload
         payload['passage_at'] = passage_at
@@ -389,8 +375,8 @@ class TestVerkeersvergunningen:
         assert response.status_code == 403
 
     def test_wrong_basic_auth_credentials_for_decos(self, client, mocker):
-        mock_response = MockResponse(401)
-        mocker.patch('zwaarverkeer.views.DecosJoin._do_request', return_value=mock_response)
+        mock_response = MockResponse(401, json_content={})
+        mocker.patch('zwaarverkeer.views.DecosZwaarverkeer._get_response', return_value=mock_response)
 
         response = client.post(
             self.URL,
@@ -401,7 +387,7 @@ class TestVerkeersvergunningen:
         assert response.status_code == 502
 
     def test_decos_timeout(self, client, mocker):
-        mocker.patch('zwaarverkeer.views.DecosJoin._do_request', side_effect=requests.exceptions.ReadTimeout)
+        mocker.patch('zwaarverkeer.views.DecosZwaarverkeer._get_response', side_effect=requests.exceptions.ReadTimeout)
 
         response = client.post(
             self.URL,

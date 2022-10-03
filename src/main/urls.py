@@ -24,7 +24,7 @@ schema_view = get_schema_view(
    openapi.Info(
       title="Verkeersvergunningen API",
       default_version='v1',
-      description="An API to get the verkeersvergunningen. Currently only for zwaar verkeer.",
+      description="API om verkeersvergunningen te verzamelen voor taxi's en zwaarverkeer",
       license=openapi.License(name="Mozilla Public License Version 2.0"),
    ),
    public=True,
@@ -33,6 +33,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('zwaarverkeer/', include('zwaarverkeer.urls')),
+    path('taxi/', include('taxi.urls')),
     path('status/', include('health.urls')),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path(r'swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

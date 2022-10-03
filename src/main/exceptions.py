@@ -1,8 +1,4 @@
-import logging
-
 from django.http import HttpResponse
-
-log = logging.getLogger(__name__)
 
 
 class ImmediateHttpResponse(Exception):

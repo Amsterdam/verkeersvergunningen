@@ -5,54 +5,35 @@ from braces.views import CsrfExemptMixin
 from dateutil import parser
 from django.http import HttpResponse
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from zwaarverkeer.authentication import BasicAuthWithKeys
-from zwaarverkeer.decos_join import DecosJoin
-from zwaarverkeer.tools import ImmediateHttpResponse
+from main.authentication import BasicAuthWithKeys
+from zwaarverkeer.serializers import PermitsRequestSerializer, PermitsResponseSerializer
+from zwaarverkeer.decos import DecosZwaarverkeer
+from main.exceptions import ImmediateHttpResponse
 
 log = logging.getLogger(__name__)
 
 
-class PermitRequestSerializer(serializers.Serializer):
-    number_plate = serializers.CharField(min_length=6, max_length=6)
-    passage_at = serializers.DateTimeField()
-
-
-class PermitSerializer(serializers.Serializer):
-    permit_type = serializers.CharField(required=False, allow_null=True)
-    permit_description = serializers.CharField(required=False)
-    valid_from = serializers.DateTimeField(required=True)  # (required=False, allow_null=True)
-    valid_until = serializers.DateTimeField(required=True)    # (required=False, allow_null=True)
-
-
-class PermitsResponseSerializer(serializers.Serializer):
-    number_plate = serializers.CharField(min_length=6, max_length=6)
-    passage_at = serializers.DateTimeField()
-    has_permit = serializers.BooleanField()
-    permits = PermitSerializer(many=True)
-
-
-class HasPermitView(CsrfExemptMixin, APIView):
+class PermitView(CsrfExemptMixin, APIView):
     http_method_names = ['post']
     authentication_classes = [BasicAuthWithKeys]
 
     @swagger_auto_schema(
-        request_body=PermitRequestSerializer,
+        request_body=PermitsRequestSerializer,
         responses={200: PermitsResponseSerializer},  # TODO:Define more responses here
     )
     def post(self, request):
-        request_serializer = PermitRequestSerializer(data=request.data)
+        request_serializer = PermitsRequestSerializer(data=request.data)
         request_serializer.is_valid(raise_exception=True)
 
         number_plate = request.data['number_plate'].upper()
         passage_at = parser.parse(request.data['passage_at'])  # naive local datetime?
 
         try:
-            decos = DecosJoin()
-            permits = decos.get_permits(number_plate, passage_at)
+            decos = DecosZwaarverkeer()
+            permits = decos.get_permits(number_plate=number_plate, passage_at=passage_at)
             response = {
                 'number_plate': number_plate,
                 'passage_at': request.data['passage_at'],
@@ -65,7 +46,3 @@ class HasPermitView(CsrfExemptMixin, APIView):
 
         except ImmediateHttpResponse as e:
             return e.response
-        except requests.exceptions.ReadTimeout:
-            return HttpResponse(status=504)
-        # TODO: also catch validation exception
-        # TODO: test whether this also works with drf exception handling

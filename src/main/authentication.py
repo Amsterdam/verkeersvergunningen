@@ -2,7 +2,7 @@ import base64
 import logging
 
 from django.conf import settings
-from rest_framework import authentication, exceptions, serializers
+from rest_framework import authentication, exceptions
 
 log = logging.getLogger(__name__)
 

@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import taxi
 from main.exceptions import ImmediateHttpResponse
-from .mock_data import mock_zaaknummer, mock_permits
+from .mock_data import mock_driver, mock_permits, mock_handhavingszaken, mock_parsed_enforcement_cases
 
 from taxi.decos import DecosTaxi
 from taxi.enums import DecosZaaknummers, PermitParams
@@ -28,7 +28,7 @@ class TestDecosTaxi:
 
     def test_parse_decos_key(self, decos):
         zaaknr = "555aaa555"
-        data = mock_zaaknummer()
+        data = mock_driver()
         response = decos._parse_decos_key(data)
         assert [zaaknr] == response
 
@@ -49,13 +49,12 @@ class TestDecosTaxi:
         response = decos._parse_decos_permits(data)
         assert response == permits
 
-    def test_invalid_parse_zaaknummer(self, decos):
+    def test_invalid_parse_decos_key(self, decos):
         data = {"invalid": "data"}
         with pytest.raises(ImmediateHttpResponse):
             decos._parse_decos_key(data)
 
-    def test_get_decos_key(self, mocker, decos):
-
+    def test_get_driver_decos_key(self, mocker, decos):
         DECOS_KEY = DecosZaaknummers.bsn.value
         BSN_NUM = "233090125"
         expected_request_url = (
@@ -82,6 +81,31 @@ class TestDecosTaxi:
         "taxi.decos.DecosTaxi._get_response",
         lambda *args, **kwargs: MockResponse(
             200,
+            mock_handhavingszaken(),
+        ),
+    )
+    def test_get_handhavingzaken(self, decos):
+        permit_decos_key = "fake_key_12395"
+        enforcement_cases = decos._get_handhavingzaken(permit_decos_key=permit_decos_key)
+        assert enforcement_cases == mock_parsed_enforcement_cases()
+
+    @patch("taxi.decos.DecosTaxi._get_handhavingzaken", return_value=mock_parsed_enforcement_cases())
+    def test_add_enforcement_cases_to_permit_data(self, mock_get_handhavingszaken, decos):
+        permit = {
+            PermitParams.zaakidentificatie.name: "fake_permit_123",
+            PermitParams.geldigVanaf.name: "2022-08-29",
+            PermitParams.geldigTot.name: "2022-09-28",
+        }
+        permit_values = {**permit}
+        decos._add_enforcement_cases_to_permit_data(permit=permit)
+
+        mock_get_handhavingszaken.assert_called_with(permit_decos_key="fake_permit_123")
+        assert permit == {**permit_values, "schorsingen": mock_parsed_enforcement_cases()}
+
+    @patch(
+        "taxi.decos.DecosTaxi._get_response",
+        lambda *args, **kwargs: MockResponse(
+            200,
             {
                 "content": [
                     {"key": "0987654", "fields": {"date6": "2022-08-29T00:00:00", "date7": "2022-09-28T00:00:00"}},
@@ -90,12 +114,12 @@ class TestDecosTaxi:
             },
         ),
     )
-    def test_get_driver_permits_simple(self, decos):
+    def test_get_ontheffingen_driver_simple(self, decos):
         driver_decos_key = "1234567"
-        permits = decos._get_ontheffingen(driver_decos_key)
+        permits = decos._get_ontheffingen_driver(driver_decos_key)
         assert [p[PermitParams.zaakidentificatie.name] for p in permits] == ["0987654", "12345678"]
 
-    def test_get_driver_permits_extensive(self, mocker, decos):
+    def test_get_ontheffingen_driver_extensive(self, mocker, decos):
         DECOS_KEY = "07DAD65792F24AFEB59FF9D7028A6DD6"
         PERMIT_1 = "7CAAF40DB75A46BDB5CD5B2A948221B3"
         PERMIT_2 = "8E5F8EB000EC4938BC894CA2313E9134"
@@ -115,8 +139,7 @@ class TestDecosTaxi:
         mock_response = MockResponse(200, json_content=decos_response)
         mocker.patch("taxi.decos.DecosTaxi._get_response", return_value=mock_response)
 
-        url = decos._build_url(zaaknummer=DECOS_KEY, folder='FOLDERS')
-        permits = decos._get_ontheffingen(url=url)
+        permits = decos._get_ontheffingen_driver(driver_decos_key=DECOS_KEY)
 
         # Check if the prepared url is correct
         mocked_response_function = taxi.decos.DecosTaxi._get_response
@@ -125,23 +148,6 @@ class TestDecosTaxi:
         assert r.url == expected_request_url
         # Check if the return value is parsed correctly
         assert [p[PermitParams.zaakidentificatie.name] for p in permits] == [PERMIT_1, PERMIT_2]
-
-    @patch(
-        "taxi.decos.DecosTaxi._get_response",
-        lambda *args, **kwargs: MockResponse(
-            200,
-            {
-                "content": [
-                    {"key": "0987654", "fields": {"date6": "2022-08-29T00:00:00", "date7": "2022-09-28T00:00:00"}},
-                    {"key": "12345678", "fields": {"date6": "2022-08-29T00:00:00", "date7": "2022-09-28T00:00:00"}},
-                ]
-            },
-        ),
-    )
-    def test_get_enforcement_cases(self, decos):
-        license_casenr = "fake"
-        cases = decos._get_handhavingzaken(license_casenr)
-        assert [p[PermitParams.zaakidentificatie.name] for p in cases] == ["0987654", "12345678"]
 
     @patch("taxi.decos.DecosTaxi._get_driver_decos_key", lambda *args, **kwargs: "fake_758697")
     @patch(
@@ -156,7 +162,7 @@ class TestDecosTaxi:
             },
         ),
     )
-    def test_get_taxi_permit(self, decos):
+    def test_get_ontheffingen_by_driver_bsn(self, decos):
         bsn = "bsn_fake"
         driver_permits = decos.get_ontheffingen_by_driver_bsn(driver_bsn=bsn)
         assert [p[PermitParams.zaakidentificatie.name] for p in driver_permits] == ["abcd12346", "12345678abc"]

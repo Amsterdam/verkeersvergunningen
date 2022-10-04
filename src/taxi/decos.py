@@ -16,7 +16,7 @@ class DecosTaxi(DecosBase):
         request the permit from a driver based on their bsn nr
         """
         decos_key = self._get_driver_decos_key(driver_bsn)
-        driver_permits = self._get_ontheffingen_by_decos_key(decos_key)
+        driver_permits = self.get_ontheffingen_by_decos_key_driver(decos_key)
         return driver_permits
 
     def _get_driver_decos_key(self, driver_bsn: str) -> str:
@@ -47,28 +47,35 @@ class DecosTaxi(DecosBase):
         return zaaknummers[0]
 
     def get_ontheffingen_by_decos_key_driver(self, driver_decos_key):
-        url = self._build_url(zaaknummer=driver_decos_key, folder=DecosFolders.folders.value)
-        permits = self._get_ontheffingen_by_decos_key(url=url)
-        return permits
-
-    def get_ontheffingen_by_decos_key_ontheffing(self, ontheffing_decos_key):
-        url = self._build_url(zaaknummer=ontheffing_decos_key, folder='')
-        permits = self._get_ontheffingen_by_decos_key(url=url)
-        return permits[0]
-
-    def _get_ontheffingen_by_decos_key(self, url):
-        driver_permits = self._get_ontheffingen(url)
+        driver_permits = self._get_ontheffingen_driver(driver_decos_key=driver_decos_key)
         for permit in driver_permits:
-            zaaknummer = permit[PermitParams.zaakidentificatie.name]
-            enforcement_cases = self._get_handhavingzaken(permit_decos_key=zaaknummer)
-            permit["schorsingen"] = enforcement_cases
+            self._add_enforcement_cases_to_permit_data(permit)
         return driver_permits
 
-    def _get_ontheffingen(self, url: str) -> list[dict]:
+    def _get_ontheffingen_driver(self, driver_decos_key: str) -> list[dict]:
         """
         get the documents from the driver based on the drivers key
         """
+        url = self._build_url(zaaknummer=driver_decos_key, folder=DecosFolders.folders.value)
+        response = self._get_ontheffing(url)
+        driver_permits = self._parse_decos_permits(response)
+        return driver_permits
 
+    def get_ontheffing_by_decos_key_ontheffing(self, ontheffing_decos_key: str) -> dict:
+        permit = self._get_ontheffing_details(ontheffing_decos_key=ontheffing_decos_key)
+        self._add_enforcement_cases_to_permit_data(permit)
+        return permit
+
+    def _get_ontheffing_details(self, ontheffing_decos_key: str) -> dict:
+        """
+        get the documents from the driver based on the drivers key
+        """
+        url = self._build_url(zaaknummer=ontheffing_decos_key, folder='')
+        response = self._get_ontheffing(url)
+        permit = self._parse_permit(response)
+        return permit
+
+    def _get_ontheffing(self, url: str):
         class DecosParams(Enum):
             geldigVanaf = "date6"
             geldigTot = "date7"
@@ -90,8 +97,13 @@ class DecosTaxi(DecosBase):
             "oDataQuery.filter": odata_filter.parse(filters),
         }
         response = self._get(url, parameters)
-        driver_permits = self._parse_decos_permits(response)
-        return driver_permits
+        return response
+
+    def _add_enforcement_cases_to_permit_data(self, permit: dict):
+        zaaknummer = permit[PermitParams.zaakidentificatie.name]
+        enforcement_cases = self._get_handhavingzaken(permit_decos_key=zaaknummer)
+        print(enforcement_cases)
+        permit["schorsingen"] = enforcement_cases
 
     def _get_handhavingzaken(self, permit_decos_key: str) -> list[dict]:
         """
@@ -129,16 +141,19 @@ class DecosTaxi(DecosBase):
     def _parse_decos_permits(self, data: dict) -> list[dict]:
         try:
             parsed_permits = [
-                {
-                    PermitParams.zaakidentificatie.name: permit[PermitParams.zaakidentificatie.value],
-                    PermitParams.geldigVanaf.name: permit["fields"][PermitParams.geldigVanaf.value],
-                    PermitParams.geldigTot.name: permit["fields"][PermitParams.geldigTot.value],
-                }
+                self._parse_permit(permit)
                 for permit in data["content"]
             ]
             return parsed_permits
         except KeyError as e:
             raise ImmediateHttpResponse(e)
+
+    def _parse_permit(self, permit: dict) -> dict:
+        return {
+            PermitParams.zaakidentificatie.name: permit[PermitParams.zaakidentificatie.value],
+            PermitParams.geldigVanaf.name: permit["fields"][PermitParams.geldigVanaf.value],
+            PermitParams.geldigTot.name: permit["fields"][PermitParams.geldigTot.value],
+        }
 
     def _build_url(self, *, zaaknummer: str, folder: str) -> str:
         return os.path.join(self.base_url, zaaknummer, folder)

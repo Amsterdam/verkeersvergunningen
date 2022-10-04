@@ -60,7 +60,7 @@ class OntheffingDetailView(CsrfExemptMixin, APIView):
         """
         try:
             decos = DecosTaxi()
-            data = decos.get_ontheffingen_by_decos_key_ontheffing(ontheffing_decos_key=ontheffingsnummer)
+            data = decos.get_ontheffing_by_decos_key_ontheffing(ontheffing_decos_key=ontheffingsnummer)
             response_serializer = OntheffingDetailResponseSerializer(data=data)
             response_serializer.is_valid(raise_exception=True)
             return Response(response_serializer.data)

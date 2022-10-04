@@ -2,11 +2,15 @@ import os
 from enum import Enum
 from odata_request_parser.main import OdataFilterParser, OdataSelectParser
 
+from main import settings
 from main.decos import DecosBase, ImmediateHttpResponse
 from taxi.enums import DecosFolders, DecosZaaknummers, PermitParams
 
 
 class DecosTaxi(DecosBase):
+    auth_user = settings.DECOS_TAXI_AUTH_USER
+    auth_pass = settings.DECOS_TAXI_AUTH_PASS
+
     def get_ontheffingen_by_driver_bsn(self, driver_bsn: str) -> list[dict]:
         """
         request the permit from a driver based on their bsn nr

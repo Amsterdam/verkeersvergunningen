@@ -12,7 +12,6 @@ from taxi.serializers import (
     OntheffingDetailResponseSerializer,
 )
 from main.authentication import BasicAuthWithKeys
-from main.exceptions import ImmediateHttpResponse
 from taxi.decos import DecosTaxi
 
 log = logging.getLogger(__name__)
@@ -35,15 +34,11 @@ class OntheffingenBSNView(CsrfExemptMixin, APIView):
         serializer.is_valid(raise_exception=True)
 
         bsn = serializer.validated_data["bsn"]
-        try:
-            decos = DecosTaxi()
-            data = decos.get_ontheffingen_by_driver_bsn(driver_bsn=bsn)
-            response_serializer = OntheffingenResponseSerializer(data={"ontheffing": data})
-            response_serializer.is_valid(raise_exception=True)
-            return Response(response_serializer.data)
-
-        except ImmediateHttpResponse as e:
-            return e.response
+        decos = DecosTaxi()
+        data = decos.get_ontheffingen_by_driver_bsn(driver_bsn=bsn)
+        response_serializer = OntheffingenResponseSerializer(data={"ontheffing": data})
+        response_serializer.is_valid(raise_exception=True)
+        return Response(response_serializer.data)
 
 
 class OntheffingDetailView(CsrfExemptMixin, APIView):
@@ -58,12 +53,8 @@ class OntheffingDetailView(CsrfExemptMixin, APIView):
         create a proxy request to decos to query the 'handhavingen' permits
         Based on the 'ontheffingsnummer' retrieve all the 'handhavingen'
         """
-        try:
-            decos = DecosTaxi()
-            data = decos.get_ontheffing_by_decos_key_ontheffing(ontheffing_decos_key=ontheffingsnummer)
-            response_serializer = OntheffingDetailResponseSerializer(data=data)
-            response_serializer.is_valid(raise_exception=True)
-            return Response(response_serializer.data)
-
-        except ImmediateHttpResponse as e:
-            return e.response
+        decos = DecosTaxi()
+        data = decos.get_ontheffing_by_decos_key_ontheffing(ontheffing_decos_key=ontheffingsnummer)
+        response_serializer = OntheffingDetailResponseSerializer(data=data)
+        response_serializer.is_valid(raise_exception=True)
+        return Response(response_serializer.data)

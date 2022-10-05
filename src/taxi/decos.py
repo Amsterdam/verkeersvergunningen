@@ -3,8 +3,9 @@ from enum import Enum
 from odata_request_parser.main import OdataFilterParser, OdataSelectParser
 
 from main import settings
-from main.decos import DecosBase, ImmediateHttpResponse
+from main.decos import DecosBase
 from taxi.enums import DecosFolders, DecosZaaknummers, PermitParams
+from django_http_exceptions import HTTPExceptions
 
 
 class DecosTaxi(DecosBase):
@@ -43,7 +44,7 @@ class DecosTaxi(DecosBase):
         data = self._get(url, parameters)
         zaaknummers = self._parse_decos_key(data)
         if not len(zaaknummers) == 1:
-            raise ImmediateHttpResponse("Error finding decos_key for that BSN")
+            raise HTTPExceptions.NOT_FOUND.with_content("Error finding decos_key for that BSN")
         return zaaknummers[0]
 
     def get_ontheffingen_by_decos_key_driver(self, driver_decos_key):
@@ -133,20 +134,24 @@ class DecosTaxi(DecosBase):
         return driver_enforcement_cases
 
     def _parse_decos_key(self, data: dict) -> list[str]:
+        if data == "Not Found" or not data.get("content"):
+            raise HTTPExceptions.NO_CONTENT.with_content("No data found in Decos for that query")
         try:
             return [c["key"] for c in data["content"]]
-        except KeyError as e:
-            raise ImmediateHttpResponse(e)
+        except KeyError:
+            raise HTTPExceptions.NOT_IMPLEMENTED.with_content("Could not parse the response from Decos")
 
     def _parse_decos_permits(self, data: dict) -> list[dict]:
+        if data == "Not Found" or not data.get("content"):
+            raise HTTPExceptions.NO_CONTENT.with_content("No data found in Decos for that query")
         try:
             parsed_permits = [
                 self._parse_permit(permit)
                 for permit in data["content"]
             ]
             return parsed_permits
-        except KeyError as e:
-            raise ImmediateHttpResponse(e)
+        except KeyError:
+            raise HTTPExceptions.NOT_IMPLEMENTED.with_content("Could not parse the response from Decos")
 
     def _parse_permit(self, permit: dict) -> dict:
         return {

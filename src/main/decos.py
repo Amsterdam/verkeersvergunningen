@@ -3,12 +3,9 @@ import urllib
 import requests
 
 from urllib.parse import quote
-from requests import RequestException
 
 from django.conf import settings
-from django.http import HttpResponse
-
-from main.exceptions import ImmediateHttpResponse
+from django_http_exceptions import HTTPExceptions
 
 
 log = logging.getLogger(__name__)
@@ -26,13 +23,17 @@ class DecosBase:
             response = self._get_response(params=parsed_params, url=url)
             # TODO: account for pagination in the decos join api
             response.raise_for_status()
+        except requests.exceptions.ConnectionError:
+            raise HTTPExceptions.SERVICE_UNAVAILABLE.with_content("Unable to reach Decos server")
         except requests.exceptions.ReadTimeout:
-            raise ImmediateHttpResponse(response=HttpResponse("Timeout trying to fetch data from Decos", status=504))
-        except RequestException as e:
-            log.error(f"We got an {e.response.status_code} "
-                      f"error from Decos Join saying: {e.response.content}")
-            raise ImmediateHttpResponse(response=HttpResponse(
-                "We got an error response from Decos Join", status=502))
+            raise HTTPExceptions.GATEWAY_TIMEOUT("Timeout trying to fetch data from Decos")
+        except requests.exceptions.RequestException as e:
+            if e.response:
+                log.error(f"We got an {e.response.status_code} "
+                          f"error from Decos Join saying: {e.response.content}")
+            else:
+                log.error("No response received from Decos")
+            raise HTTPExceptions.BAD_GATEWAY("We got an error response from Decos")
 
         return response.json()
 

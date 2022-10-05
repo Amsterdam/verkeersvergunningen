@@ -5,12 +5,12 @@ import pytest
 from unittest.mock import patch
 
 import taxi
-from main.exceptions import ImmediateHttpResponse
 from .mock_data import mock_driver, mock_permits, mock_handhavingszaken, mock_parsed_enforcement_cases
 
 from taxi.decos import DecosTaxi
 from taxi.enums import DecosZaaknummers, PermitParams
 from ..utils import MockResponse
+from django_http_exceptions import HTTPExceptions
 
 
 @pytest.fixture
@@ -51,7 +51,7 @@ class TestDecosTaxi:
 
     def test_invalid_parse_decos_key(self, decos):
         data = {"invalid": "data"}
-        with pytest.raises(ImmediateHttpResponse):
+        with pytest.raises(HTTPExceptions.NOT_IMPLEMENTED):
             decos._parse_decos_key(data)
 
     def test_get_driver_decos_key(self, mocker, decos):

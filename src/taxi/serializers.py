@@ -10,7 +10,7 @@ class OntheffingenRequestSerializer(serializers.Serializer):
     bsn = serializers.IntegerField()
 
     def validate_bsn(self, value):
-        if not (value.isdigit() and len(value) == 9):
+        if not len(str(value)) == 9:
             raise ValidationError("The BSN number should be 9 digits")
         return value
 

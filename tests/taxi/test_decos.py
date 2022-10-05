@@ -49,8 +49,13 @@ class TestDecosTaxi:
         response = decos._parse_decos_permits(data)
         assert response == permits
 
+    def test_invalid_parse_decos_key_no_content(self, decos):
+        data = {"no": "content"}
+        with pytest.raises(HTTPExceptions.NO_CONTENT):
+            decos._parse_decos_key(data)
+
     def test_invalid_parse_decos_key(self, decos):
-        data = {"invalid": "data"}
+        data = {"content": [{"something": "unfamiliar"}]}
         with pytest.raises(HTTPExceptions.NOT_IMPLEMENTED):
             decos._parse_decos_key(data)
 

@@ -1,12 +1,18 @@
 import logging
 
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 log = logging.getLogger(__name__)
 
 
 class OntheffingenRequestSerializer(serializers.Serializer):
     bsn = serializers.IntegerField()
+
+    def validate_bsn(self, value):
+        if not len(str(value)) == 9:
+            raise ValidationError("The BSN number should be 9 digits")
+        return value
 
 
 class HandhavingSerializer(serializers.Serializer):

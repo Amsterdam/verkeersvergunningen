@@ -11,3 +11,4 @@ djangorestframework
 django-braces
 drf-yasg
 odata-request-parser  # Deze library wordt door ons beheerd: https://github.com/Amsterdam/odata_request_parser
+django-http-exceptions

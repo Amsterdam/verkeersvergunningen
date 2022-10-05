@@ -40,7 +40,7 @@ class TestUrls:
         ],
     )
     def test_ontheffingen_bsn(self, client):
-        data = {"bsn": 12345678}
+        data = {"bsn": 123456789}
         url = reverse("taxi_ontheffingen_bsn")
         response = client.post(url, data=data)
         assert response.status_code == status.HTTP_200_OK
@@ -74,7 +74,7 @@ class TestUrls:
         ],
     )
     def test_get_ontheffingen_by_driver_bsn(self, client):
-        data = {"bsn": 12345678}
+        data = {"bsn": 123456789}
         url = reverse("taxi_ontheffingen_bsn")
         response = client.post(url, data=data)
         assert response.status_code == status.HTTP_200_OK

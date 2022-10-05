@@ -5,7 +5,6 @@ import pytest
 import requests
 from dateutil.parser import parse
 from django.conf import settings
-from tests.utils import MockResponse
 
 from tests.utils import MockResponse
 from zwaarverkeer.decos import DecosZwaarverkeer

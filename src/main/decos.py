@@ -35,7 +35,10 @@ class DecosBase:
                 log.error("No response received from Decos")
             raise HTTPExceptions.BAD_GATEWAY("We got an error response from Decos")
 
-        return response.json()
+        data = response.json()
+        if isinstance(data, str) or not data.get("content"):
+            raise HTTPExceptions.NO_CONTENT.with_content("No data found in Decos for that query")
+        return data
 
     def _get_response(self, params, url):
         response = requests.get(

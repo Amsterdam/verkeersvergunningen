@@ -12,7 +12,7 @@ from taxi.serializers import (
     OntheffingDetailResponseSerializer,
 )
 from main.authentication import BasicAuthWithKeys
-from taxi.decos import DecosTaxi
+from taxi.decos import DecosTaxiDriver, DecosTaxiDetail
 
 log = logging.getLogger(__name__)
 
@@ -34,8 +34,9 @@ class OntheffingenBSNView(CsrfExemptMixin, APIView):
         serializer.is_valid(raise_exception=True)
 
         bsn = serializer.validated_data["bsn"]
-        decos = DecosTaxi()
-        data = decos.get_ontheffingen_by_driver_bsn(driver_bsn=bsn)
+        ontheffingsnummer = serializer.validated_data["ontheffingsnummer"]
+        decos = DecosTaxiDriver()
+        data = decos.get_ontheffingen(driver_bsn=bsn, ontheffingsnummer=ontheffingsnummer)
         response_serializer = OntheffingenResponseSerializer(data={"ontheffing": data})
         response_serializer.is_valid(raise_exception=True)
         return Response(response_serializer.data)
@@ -53,8 +54,8 @@ class OntheffingDetailView(CsrfExemptMixin, APIView):
         create a proxy request to decos to query the 'handhavingen' permits
         Based on the 'ontheffingsnummer' retrieve all the 'handhavingen'
         """
-        decos = DecosTaxi()
-        data = decos.get_ontheffing_by_decos_key_ontheffing(ontheffing_decos_key=ontheffingsnummer)
-        response_serializer = OntheffingDetailResponseSerializer(data=data)
+        decos = DecosTaxiDetail()
+        data = decos.get_ontheffingen(ontheffingsnummer=ontheffingsnummer)
+        response_serializer = OntheffingDetailResponseSerializer(data={"ontheffing": data})
         response_serializer.is_valid(raise_exception=True)
         return Response(response_serializer.data)

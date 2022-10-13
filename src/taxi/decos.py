@@ -52,7 +52,7 @@ class DecosTaxi(DecosBase):
             ]
             return parsed_permits
         except KeyError:
-            raise HTTPExceptions.NOT_IMPLEMENTED.with_content("Could not parse the response from Decos")
+            raise HTTPExceptions.NOT_IMPLEMENTED.with_content("Could not parse the handhaving from Decos")
 
     def _parse_enforcement_case(self, permit: dict) -> dict:
         return {
@@ -69,13 +69,13 @@ class DecosTaxi(DecosBase):
             ]
             return parsed_permits
         except KeyError as e:
-            raise HTTPExceptions.NOT_IMPLEMENTED.with_content("Could not parse the response from Decos") from e
+            raise HTTPExceptions.NOT_IMPLEMENTED.with_content("Could not parse the ontheffing from Decos") from e
 
     def _parse_permit(self, permit: dict) -> dict:
         fields = permit["fields"]
         data = {
-            PermitParams.ontheffingsnummer.name: fields[PermitParams.ontheffingsnummer.value],
             PermitParams.zaakidentificatie.name: permit[PermitParams.zaakidentificatie.value],
+            PermitParams.ontheffingsnummer.name: fields[PermitParams.ontheffingsnummer.value],
             PermitParams.geldigVanaf.name: fields[PermitParams.geldigVanaf.value],
             PermitParams.geldigTot.name: fields[PermitParams.geldigTot.value],
         }
@@ -93,6 +93,7 @@ class DecosTaxiDriver(DecosTaxi):
         driver_data = self._get_driver_decos_key(driver_bsn)
         driver_key = self._parse_driver_key(driver_data)
         permits_data = self._get_ontheffing(driver_key=driver_key, ontheffingsnummer=ontheffingsnummer)
+        permits_data["content"][0]["fields"][PermitParams.ontheffingsnummer.value] = ontheffingsnummer
         driver_permits = self._parse_decos_permits(permits_data)
         for permit in driver_permits:
             self._add_enforcement_cases_to_permit_data(permit)
@@ -154,7 +155,6 @@ class DecosTaxiDriver(DecosTaxi):
         # Het zaaknummer refereerd in deze URL naar de chauffeur!
         url = self._build_url(zaaknummer=driver_key, folder=DecosFolders.folders.value)
         data = self._get(url, parameters)
-        data[PermitParams.ontheffingsnummer.value] = ontheffingsnummer
         return data
 
 

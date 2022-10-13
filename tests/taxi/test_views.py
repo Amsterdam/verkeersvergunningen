@@ -18,20 +18,20 @@ def force_auth(*args, **kwargs):
 
 
 @patch("main.authentication.BasicAuthWithKeys.authenticate", force_auth)
-class TestUrls:
-    @patch("taxi.decos.DecosTaxiDriver._get_driver_decos_key", mock_driver())
-    @patch("taxi.decos.DecosTaxiDriver._get_ontheffing", mock_ontheffing_driver())
-    @patch("taxi.decos.DecosTaxiDriver._get_handhavingzaken", mock_handhavingen())
+class TestViews:
+    @patch("taxi.decos.DecosTaxiDriver._get_driver_decos_key", lambda *args, **kwargs: mock_driver())
+    @patch("taxi.decos.DecosTaxiDriver._get_ontheffing", lambda *args, **kwargs: mock_ontheffing_driver())
+    @patch("taxi.decos.DecosTaxiDriver._get_handhavingzaken", lambda *args, **kwargs: mock_handhavingen())
     def test_ontheffingen_bsn(self, client):
         data = {"bsn": 123456789, "ontheffingsnummer": 1234567}
         url = reverse("taxi_ontheffingen_bsn")
         response = client.post(url, data=data)
         assert response.status_code == status.HTTP_200_OK
-        assert PermitParams.zaakidentificatie.name in response.data["ontheffing"][0]
-        assert response.data["ontheffing"][0][PermitParams.zaakidentificatie.name] == "8E5F8EB000EC4938BC894CA2313E9134"
+        assert PermitParams.ontheffingsnummer.name in response.data["ontheffing"][0]
+        assert response.data["ontheffing"][0][PermitParams.ontheffingsnummer.name] == str(data["ontheffingsnummer"])
         assert (
             response.data["ontheffing"][0]["schorsingen"][0][PermitParams.zaakidentificatie.name]
-            == "8E5F8EB000EC4938BC894CA2313E9134"
+            == "7CAAF40DB75A46BDB5CD5B2A948221B3"
         )
 
     def test_ontheffingen_bsn_too_few_digits(self, client):
@@ -44,23 +44,23 @@ class TestUrls:
         data = {"bsn": 123456789, "ontheffingsnummer": 1234567890}
         url = reverse("taxi_ontheffingen_bsn")
         response = client.post(url, data=data)
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert status.HTTP_400_BAD_REQUEST == response.status_code
 
     @patch(
         "taxi.decos.DecosTaxiDriver.get_ontheffingen",
         lambda *args, **kwargs: [
             {
-                "zaakidentificatie": "8E5F8EB000EC4938BC894CA2313E9134",
+                "ontheffingsnummer": "8E5F8EB000EC4938BC894CA2313E9134",
                 "geldigVanaf": "2022-08-01T00:00:00",
                 "geldigTot": "2025-07-31T00:00:00",
                 "schorsingen": [
                     {
-                        "ontheffingsnummer": "1234567",
+                        "zaakidentificatie": "1234567",
                         "geldigVanaf": "2022-08-29T00:00:00",
                         "geldigTot": "2022-09-28T00:00:00",
                     },
                     {
-                        "ontheffingsnummer": "1234567",
+                        "zaakidentificatie": "1234567",
                         "geldigVanaf": "2022-09-05T00:00:00",
                         "geldigTot": "2022-09-26T00:00:00",
                     },
@@ -73,17 +73,20 @@ class TestUrls:
         url = reverse("taxi_ontheffingen_bsn")
         response = client.post(url, data=data)
         assert response.status_code == status.HTTP_200_OK
-        assert PermitParams.zaakidentificatie.name in response.data["ontheffing"][0]
-        assert response.data["ontheffing"][0][PermitParams.zaakidentificatie.name] == "8E5F8EB000EC4938BC894CA2313E9134"
+        assert PermitParams.ontheffingsnummer.name in response.data["ontheffing"][0]
+        assert response.data["ontheffing"][0][PermitParams.ontheffingsnummer.name] == "8E5F8EB000EC4938BC894CA2313E9134"
         assert len(response.data["ontheffing"][0]["schorsingen"]) == 2
 
-    @patch("taxi.decos.DecosTaxiDetail._get_ontheffing", mock_ontheffing_detail())
-    @patch("taxi.decos.DecosTaxiDetail._get_handhavingzaken", mock_handhavingen())
+    @patch("taxi.decos.DecosTaxiDetail._get_ontheffing", lambda *args, **kwargs: mock_ontheffing_detail())
+    @patch("taxi.decos.DecosTaxiDetail._get_handhavingzaken", lambda *args, **kwargs: mock_handhavingen())
     def test_ontheffingen_detail(self, client):
-        kwargs = {"ontheffingsnummer": 1234567}
+        kwargs = {"ontheffingsnummer": 1978110.0}
         url = reverse("taxi_ontheffing_details", kwargs=kwargs)
         response = client.get(url)
         assert response.status_code == status.HTTP_200_OK
-        assert PermitParams.zaakidentificatie.name in response.data
-        assert response.data[PermitParams.zaakidentificatie.name] == "permit_fake_12345"
-        assert response.data["schorsingen"][0][PermitParams.zaakidentificatie.name] == "schorsing_fake_12345"
+        assert PermitParams.ontheffingsnummer.name in response.data["ontheffing"][0]
+        assert response.data["ontheffing"][0][PermitParams.ontheffingsnummer.name] == str(kwargs["ontheffingsnummer"])
+        assert (
+            response.data["ontheffing"][0]["schorsingen"][0][PermitParams.zaakidentificatie.name]
+            == "7CAAF40DB75A46BDB5CD5B2A948221B3"
+        )

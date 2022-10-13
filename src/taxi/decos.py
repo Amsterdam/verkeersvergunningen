@@ -23,19 +23,10 @@ class DecosTaxi(DecosBase):
         get the enforcement cases from the driver based on the drivers key
         "handhaving" is synonymous for "schorsing" in this code
         """
-
-        class DecosParams(Enum):
-            resultaat = "dfunction"
-            geldigVanaf = "date6"
-            geldigTot = "date7"
-
-        odata_select = OdataSelectParser()
-        odata_select.add_fields([str(p.value) for p in DecosParams])
         parameters = {
             "properties": "false",
             "fetchParents": "false",
             "relTypeKey": permit_decos_key,
-            "oDataQuery.select": odata_select.parse(),
         }
         url = self._build_url(
             zaaknummer=DecosZaaknummers.handhavingszaken.value,
@@ -140,7 +131,6 @@ class DecosTaxiDriver(DecosTaxi):
 
         odata_select = OdataSelectParser()
         odata_filter = OdataFilterParser()
-        odata_select.add_fields([str(p.value) for p in DecosParams])
         filters = [
             {"_eq": {DecosParams.zaaktype.value: "TAXXXI Zone-ontheffing"}},
             {"_eq": {DecosParams.afgehandeld.value: "true"}},
@@ -149,7 +139,6 @@ class DecosTaxiDriver(DecosTaxi):
         parameters = {
             "properties": "false",
             "fetchParents": "false",
-            "oDataQuery.select": odata_select.parse(),
             "oDataQuery.filter": odata_filter.parse(filters),
         }
         # Het zaaknummer refereerd in deze URL naar de chauffeur!
@@ -177,7 +166,6 @@ class DecosTaxiDetail(DecosTaxi):
 
         odata_select = OdataSelectParser()
         odata_filter = OdataFilterParser()
-        odata_select.add_fields([str(p.value) for p in DecosParams])
         filters = [
             {"_eq": {DecosParams.afgehandeld.value: "true"}},
             {"_eq": {DecosParams.ontheffingsnummer.value: ontheffingsnummer}},
@@ -185,7 +173,6 @@ class DecosTaxiDetail(DecosTaxi):
         parameters = {
             "properties": "false",
             "fetchParents": "false",
-            "oDataQuery.select": odata_select.parse(),
             "oDataQuery.filter": odata_filter.parse(filters),
         }
         url = self._build_url(

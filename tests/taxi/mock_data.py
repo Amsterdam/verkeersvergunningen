@@ -123,7 +123,7 @@ def mock_handhavingen():
                     "text45": "Taxxxi handhaving",
                     "date6": "2022-09-05T00:00:00",
                     "date7": "2022-09-26T00:00:00",
-                }
+                },
             },
         ],
     }

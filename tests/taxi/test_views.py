@@ -5,8 +5,8 @@ from rest_framework import status
 from rest_framework.test import APIClient
 import pytest
 from taxi.enums import PermitParams
-from utils import MockResponse
 from .mock_data import *
+from ..utils import MockResponse
 
 
 @pytest.fixture

@@ -101,7 +101,6 @@ class TestDecosTaxiRequests:
 
         request_url = (
             BASE_URL + driver_key + "/FOLDERS?properties=false&fetchParents=false&"
-            "oDataQuery.select=date6%2Cdate7%2Cprocessed%2Cdfunction%2Ctext45%2Cit_sequence&"
             "oDataQuery.filter=text45%20eq%20%27TAXXXI%20Zone-ontheffing%27%20and%20"
             "processed%20eq%20%27true%27%20and%20it_sequence%20eq%20%271978110%27"
         )
@@ -117,7 +116,6 @@ class TestDecosTaxiRequests:
         # Check if the prepared url is correct
         request_url = (
             BASE_URL + DecosZaaknummers.zone_ontheffing.value + "/FOLDERS?properties=false&fetchParents=false&"
-            "oDataQuery.select=date6%2Cdate7%2Cprocessed%2Cdfunction%2Ctext45%2Cit_sequence&"
             "oDataQuery.filter=processed%20eq%20%27true%27%20and%20it_sequence%20eq%20%271978110%27"
         )
         self._assert_correct_url(request_url)
@@ -132,8 +130,7 @@ class TestDecosTaxiRequests:
         request_url = (
             BASE_URL
             + DecosZaaknummers.handhavingszaken.value
-            + f"/FOLDERS?properties=false&fetchParents=false&relTypeKey={ontheffingsnr}&"
-            "oDataQuery.select=dfunction%2Cdate6%2Cdate7"
+            + f"/FOLDERS?properties=false&fetchParents=false&relTypeKey={ontheffingsnr}"
         )
         self._assert_correct_url(request_url)
 

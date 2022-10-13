@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 import pytest
 from taxi.enums import PermitParams
+from utils import MockResponse
 from .mock_data import *
 
 
@@ -90,3 +91,13 @@ class TestViews:
             response.data["ontheffing"][0]["schorsingen"][0][PermitParams.zaakidentificatie.name]
             == "7CAAF40DB75A46BDB5CD5B2A948221B3"
         )
+
+    @patch(
+        "taxi.decos.DecosTaxiDetail._get_response",
+        lambda *args, **kwargs: MockResponse(200, content="Some string response"),
+    )
+    def test_ontheffingen_detail_not_found(self, client):
+        kwargs = {"ontheffingsnummer": 1978110.0}
+        url = reverse("taxi_ontheffing_details", kwargs=kwargs)
+        response = client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND

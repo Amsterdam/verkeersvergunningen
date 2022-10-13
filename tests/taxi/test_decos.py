@@ -161,7 +161,7 @@ class TestDecosTaxiResponse:
     def test_get_ontheffing_driver_empty(self, mocked_response, decos):
         mocked_response.side_effect = [
             MockResponse(200, mock_driver()),
-            MockResponse(200, mock_ontheffing_driver_empty())
+            MockResponse(200, mock_ontheffing_driver_empty()),
         ]
         with pytest.raises(HTTPExceptions.NO_CONTENT):
             decos.get_ontheffingen(driver_bsn="123", ontheffingsnummer="123")
@@ -183,4 +183,12 @@ class TestDecosTaxiResponse:
             MockResponse(200, mock_handhavingen()),
         ]
         with pytest.raises(HTTPExceptions.NO_CONTENT):
+            decos_detail.get_ontheffingen(ontheffingsnummer="123")
+
+    @patch(
+        "taxi.decos.DecosTaxiDetail._get_response",
+        lambda *args, **kwargs: MockResponse(200, content="Some string response"),
+    )
+    def test_string_response(self, decos_detail):
+        with pytest.raises(HTTPExceptions.NOT_FOUND):
             decos_detail.get_ontheffingen(ontheffingsnummer="123")

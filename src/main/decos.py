@@ -6,7 +6,7 @@ from urllib.parse import quote
 
 from django.conf import settings
 from django_http_exceptions import HTTPExceptions
-
+from requests import JSONDecodeError
 
 log = logging.getLogger(__name__)
 
@@ -35,7 +35,14 @@ class DecosBase:
                 log.error("No response received from Decos")
             raise HTTPExceptions.BAD_GATEWAY("We got an error response from Decos")
 
-        return response.json()
+        try:
+            data = response.json()
+        except JSONDecodeError:
+            raise HTTPExceptions.NOT_FOUND.with_content(f"Decos responded with error: {response.content}")
+        if not data.get("content"):
+            raise HTTPExceptions.NO_CONTENT.with_content("No data found in Decos for that query")
+        return data
+
 
     def _get_response(self, params, url):
         response = requests.get(

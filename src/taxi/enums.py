@@ -19,6 +19,7 @@ class DecosZaaknummers(Enum):
 
 
 class PermitParams(Enum):
+    ontheffingsnummer = "sequence"
     zaakidentificatie = "key"
     geldigVanaf = "date6"
     geldigTot = "date7"

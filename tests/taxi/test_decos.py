@@ -75,7 +75,7 @@ class TestDecosTaxiRequests:
     def test_get_empty_response(self, decos, mocker):
         mock_response = MockResponse(200, json_content=mock_ontheffing_driver_empty())
         mocker.patch("taxi.decos.DecosTaxi._get_response", return_value=mock_response)
-        with pytest.raises(HTTPExceptions.NO_CONTENT):
+        with pytest.raises(HTTPExceptions.NOT_FOUND):
             decos._get_ontheffing(driver_key="123", ontheffingsnummer="123")
 
     def test_get_driver_decos_key_request(self, decos, mocker):
@@ -160,7 +160,7 @@ class TestDecosTaxiResponse:
             MockResponse(200, mock_driver()),
             MockResponse(200, mock_ontheffing_driver_empty()),
         ]
-        with pytest.raises(HTTPExceptions.NO_CONTENT):
+        with pytest.raises(HTTPExceptions.NOT_FOUND):
             decos.get_ontheffingen(driver_bsn="123", ontheffingsnummer="123")
 
     @patch("taxi.decos.DecosTaxiDetail._get_response")
@@ -179,7 +179,7 @@ class TestDecosTaxiResponse:
             MockResponse(200, mock_ontheffing_detail_empty()),
             MockResponse(200, mock_handhavingen()),
         ]
-        with pytest.raises(HTTPExceptions.NO_CONTENT):
+        with pytest.raises(HTTPExceptions.NOT_FOUND):
             decos_detail.get_ontheffingen(ontheffingsnummer="123")
 
     @patch(

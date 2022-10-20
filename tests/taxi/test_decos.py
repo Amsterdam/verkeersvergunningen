@@ -47,8 +47,8 @@ class TestDecosTaxiParse:
             mock_ontheffing_detail_empty(),
         ],
     )
-    def test_parse_decos_permits(self, decos, mock_data):
-        permits = decos._parse_decos_permits(mock_data)
+    def test_parse_decos_permits(self, decos_detail, mock_data):
+        permits = decos_detail._parse_decos_permits(mock_data)
         for permit in permits:
             permit["schorsingen"] = []
             serializer = OntheffingDetailSerializer(data=permit)
@@ -56,8 +56,7 @@ class TestDecosTaxiParse:
 
     def test_parse_decos_permits_driver(self, decos):
         mock_data = mock_ontheffing_driver()
-        mock_data["content"][0]["fields"]["sequence"] = "2349234.0"
-        permits = decos._parse_decos_permits(mock_data)
+        permits = decos._parse_decos_permits(mock_data, "2349234.0")
         for permit in permits:
             permit["schorsingen"] = []
             serializer = OntheffingDetailSerializer(data=permit)
@@ -74,10 +73,10 @@ class TestDecosTaxiParse:
 
 class TestDecosTaxiRequests:
     def test_get_empty_response(self, decos, mocker):
-        mock_response = MockResponse(200, json_content=mock_ontheffing_driver_empty())
+        mock_response = MockResponse(200, json_content=mock_ontheffing_detail_empty())
         mocker.patch("taxi.decos.DecosTaxi._get_response", return_value=mock_response)
-        with pytest.raises(HTTPExceptions.NOT_FOUND):
-            decos._get_ontheffing(driver_key="123", ontheffingsnummer="123")
+        response = decos._get_ontheffing(driver_key="123", ontheffingsnummer="123")
+        assert len(response["content"]) == 0
 
     def test_get_driver_decos_key_request(self, decos, mocker):
         mock_response = MockResponse(200, json_content=mock_driver())
@@ -161,8 +160,8 @@ class TestDecosTaxiResponse:
             MockResponse(200, mock_driver()),
             MockResponse(200, mock_ontheffing_driver_empty()),
         ]
-        with pytest.raises(HTTPExceptions.NOT_FOUND):
-            decos.get_ontheffingen(driver_bsn="123", ontheffingsnummer="123")
+        driver_permits = decos.get_ontheffingen(driver_bsn="123", ontheffingsnummer="123")
+        assert len(driver_permits) == 0
 
     @patch("taxi.decos.DecosTaxiDetail._get_response")
     def test_get_ontheffing_detail(self, mocked_response, decos_detail):

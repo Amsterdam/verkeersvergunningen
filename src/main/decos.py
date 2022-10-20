@@ -39,10 +39,7 @@ class DecosBase:
             data = response.json()
         except JSONDecodeError:
             raise HTTPExceptions.NOT_FOUND.with_content(f"Decos responded with error: {response.content}")
-        if not data.get("content"):
-            raise HTTPExceptions.NOT_FOUND.with_content("No data found in Decos for that query")
         return data
-
 
     def _get_response(self, params, url):
         response = requests.get(

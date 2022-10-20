@@ -52,16 +52,6 @@ class DecosTaxi(DecosBase):
             PermitParams.geldigTot.name: permit["fields"][PermitParams.geldigTot.value].split('T')[0],
         }
 
-    def _parse_decos_permits(self, data: dict) -> list[dict]:
-        try:
-            parsed_permits = [
-                self._parse_permit(permit)
-                for permit in data["content"]
-            ]
-            return parsed_permits
-        except KeyError as e:
-            raise HTTPExceptions.NOT_IMPLEMENTED.with_content("Could not parse the ontheffing from Decos") from e
-
     def _parse_permit(self, permit: dict) -> dict:
         fields = permit["fields"]
         data = {
@@ -84,9 +74,8 @@ class DecosTaxiDriver(DecosTaxi):
         driver_data = self._get_driver_decos_key(driver_bsn)
         driver_key = self._parse_driver_key(driver_data)
         permits_data = self._get_ontheffing(driver_key=driver_key, ontheffingsnummer=ontheffingsnummer)
-        permits_data["content"][0]["fields"][PermitParams.ontheffingsnummer.value] = ontheffingsnummer
-        driver_permits = self._parse_decos_permits(permits_data)
-        for permit in driver_permits:
+        driver_permits = self._parse_decos_permits(permits_data, ontheffingsnummer=ontheffingsnummer)
+        for n, permit in enumerate(driver_permits):
             self._add_enforcement_cases_to_permit_data(permit)
         return driver_permits
 
@@ -146,10 +135,22 @@ class DecosTaxiDriver(DecosTaxi):
         data = self._get(url, parameters)
         return data
 
+    def _parse_decos_permits(self, data: dict, ontheffingsnummer: str) -> list[dict]:
+        try:
+            parsed_permits = []
+            for permit in data["content"]:
+                permit["fields"].update({PermitParams.ontheffingsnummer.value: ontheffingsnummer})
+                parsed_permits.append(self._parse_permit(permit))
+            return parsed_permits
+        except KeyError as e:
+            raise HTTPExceptions.NOT_IMPLEMENTED.with_content("Could not parse the ontheffing from Decos") from e
+
 
 class DecosTaxiDetail(DecosTaxi):
     def get_ontheffingen(self, ontheffingsnummer: str) -> list[dict]:
         data = self._get_ontheffing(ontheffingsnummer)
+        if not data.get("content"):
+            raise HTTPExceptions.NOT_FOUND.with_content("No data found in Decos for that query")
         detail_permits = self._parse_decos_permits(data)
         for permit in detail_permits:
             self._add_enforcement_cases_to_permit_data(permit)
@@ -181,3 +182,13 @@ class DecosTaxiDetail(DecosTaxi):
         )
         data = self._get(url, parameters)
         return data
+
+    def _parse_decos_permits(self, data: dict) -> list[dict]:
+        try:
+            parsed_permits = [
+                self._parse_permit(permit)
+                for permit in data["content"]
+            ]
+            return parsed_permits
+        except KeyError as e:
+            raise HTTPExceptions.NOT_IMPLEMENTED.with_content("Could not parse the ontheffing from Decos") from e

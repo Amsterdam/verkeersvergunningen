@@ -48,8 +48,8 @@ class DecosTaxi(DecosBase):
     def _parse_enforcement_case(self, permit: dict) -> dict:
         return {
             PermitParams.zaakidentificatie.name: permit[PermitParams.zaakidentificatie.value],
-            PermitParams.geldigVanaf.name: permit["fields"][PermitParams.geldigVanaf.value],
-            PermitParams.geldigTot.name: permit["fields"][PermitParams.geldigTot.value],
+            PermitParams.geldigVanaf.name: permit["fields"][PermitParams.geldigVanaf.value].split('T')[0],
+            PermitParams.geldigTot.name: permit["fields"][PermitParams.geldigTot.value].split('T')[0],
         }
 
     def _parse_decos_permits(self, data: dict) -> list[dict]:
@@ -66,9 +66,9 @@ class DecosTaxi(DecosBase):
         fields = permit["fields"]
         data = {
             PermitParams.zaakidentificatie.name: permit[PermitParams.zaakidentificatie.value],
-            PermitParams.ontheffingsnummer.name: fields[PermitParams.ontheffingsnummer.value],
-            PermitParams.geldigVanaf.name: fields[PermitParams.geldigVanaf.value],
-            PermitParams.geldigTot.name: fields[PermitParams.geldigTot.value],
+            PermitParams.ontheffingsnummer.name: str(int(float(fields[PermitParams.ontheffingsnummer.value]))),
+            PermitParams.geldigVanaf.name: fields[PermitParams.geldigVanaf.value].split('T')[0],
+            PermitParams.geldigTot.name: fields[PermitParams.geldigTot.value].split('T')[0],
         }
         return data
 

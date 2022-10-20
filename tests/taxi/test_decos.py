@@ -56,7 +56,7 @@ class TestDecosTaxiParse:
 
     def test_parse_decos_permits_driver(self, decos):
         mock_data = mock_ontheffing_driver()
-        mock_data["content"][0]["fields"]["sequence"] = "ontheffingsnummer123"
+        mock_data["content"][0]["fields"]["sequence"] = "2349234.0"
         permits = decos._parse_decos_permits(mock_data)
         for permit in permits:
             permit["schorsingen"] = []
@@ -68,6 +68,7 @@ class TestDecosTaxiParse:
         handhavingen = decos._parse_decos_enforcement_cases(mock_data)
         for hhvng in handhavingen:
             serializer = HandhavingSerializer(data=hhvng)
+            serializer.is_valid()
             assert serializer.is_valid()
 
 

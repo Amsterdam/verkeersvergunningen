@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 
 from taxi.serializers import (
     OntheffingenRequestSerializer,
-    OntheffingenResponseSerializer,
+    OntheffingenResponseSerializer, OntheffingResponseSerializer,
 )
 from main.authentication import BasicAuthWithKeys
 from taxi.decos import DecosTaxiDriver, DecosTaxiDetail
@@ -46,7 +46,7 @@ class OntheffingDetailView(CsrfExemptMixin, APIView):
     authentication_classes = [BasicAuthWithKeys]
 
     @swagger_auto_schema(
-        responses={200: OntheffingenResponseSerializer},  # TODO:Define more responses here
+        responses={200: OntheffingResponseSerializer},  # TODO:Define more responses here
     )
     def get(self, request, ontheffingsnummer: str):
         """
@@ -55,6 +55,6 @@ class OntheffingDetailView(CsrfExemptMixin, APIView):
         """
         decos = DecosTaxiDetail()
         data = decos.get_ontheffingen(ontheffingsnummer=ontheffingsnummer)
-        response_serializer = OntheffingenResponseSerializer(data={"ontheffing": data})
+        response_serializer = OntheffingResponseSerializer(data=data)
         response_serializer.is_valid(raise_exception=True)
         return Response(response_serializer.data)

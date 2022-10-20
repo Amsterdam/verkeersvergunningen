@@ -5,7 +5,7 @@ import pytest
 from unittest.mock import patch
 
 import taxi
-from taxi.serializers import OntheffingDetailSerializer, HandhavingSerializer
+from taxi.serializers import OntheffingResponseSerializer, HandhavingSerializer
 from .mock_data import *
 
 from taxi.decos import DecosTaxi, DecosTaxiDetail, DecosTaxiDriver
@@ -61,7 +61,7 @@ class TestDecosTaxiParse:
         permits = decos_detail._parse_decos_permits(mock_data)
         for permit in permits:
             permit["schorsingen"] = []
-            serializer = OntheffingDetailSerializer(data=permit)
+            serializer = OntheffingResponseSerializer(data=permit)
             assert serializer.is_valid()
 
     def test_parse_decos_permits_driver(self, decos):
@@ -69,7 +69,7 @@ class TestDecosTaxiParse:
         permits = decos._parse_decos_permits(mock_data, "2349234.0")
         for permit in permits:
             permit["schorsingen"] = []
-            serializer = OntheffingDetailSerializer(data=permit)
+            serializer = OntheffingResponseSerializer(data=permit)
             assert serializer.is_valid()
 
     def test_parse_decos_enforcement_cases(self, decos):
@@ -179,9 +179,8 @@ class TestDecosTaxiResponse:
             MockResponse(200, mock_ontheffing_detail()),
             MockResponse(200, mock_handhavingen()),
         ]
-        driver_permits = decos_detail.get_ontheffingen(ontheffingsnummer="123")
-        assert len(driver_permits) == 1
-        assert len(driver_permits[0]["schorsingen"]) == 2
+        permit = decos_detail.get_ontheffingen(ontheffingsnummer="123")
+        assert len(permit["schorsingen"]) == 2
 
     @patch("taxi.decos.DecosTaxiDetail._get_response")
     def test_get_ontheffing_detail_empty(self, mocked_response, decos_detail):

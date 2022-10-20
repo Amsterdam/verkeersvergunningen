@@ -161,9 +161,9 @@ class DecosTaxiDetail(DecosTaxi):
         if not data.get("content"):
             raise HTTPExceptions.NOT_FOUND.with_content("No data found in Decos for that query")
         detail_permits = self._parse_decos_permits(data)
-        for permit in detail_permits:
-            self._add_enforcement_cases_to_permit_data(permit)
-        return detail_permits
+        permit = detail_permits[0]
+        self._add_enforcement_cases_to_permit_data(permit)
+        return permit
 
     def _get_ontheffing(self, ontheffingsnummer: str):
         class DecosParams(Enum):

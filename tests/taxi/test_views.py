@@ -95,10 +95,10 @@ class TestViews:
         url = reverse("taxi_ontheffing_details", kwargs=kwargs)
         response = client.get(url)
         assert response.status_code == status.HTTP_200_OK
-        assert PermitParams.ontheffingsnummer.name in response.data["ontheffing"][0]
-        assert response.data["ontheffing"][0][PermitParams.ontheffingsnummer.name] == str(kwargs["ontheffingsnummer"])
+        assert PermitParams.ontheffingsnummer.name in response.data
+        assert response.data[PermitParams.ontheffingsnummer.name] == str(kwargs["ontheffingsnummer"])
         assert (
-            response.data["ontheffing"][0]["schorsingen"][0][PermitParams.zaakidentificatie.name]
+            response.data["schorsingen"][0][PermitParams.zaakidentificatie.name]
             == "7CAAF40DB75A46BDB5CD5B2A948221B3"
         )
 

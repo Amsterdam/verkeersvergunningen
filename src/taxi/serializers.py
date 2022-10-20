@@ -27,7 +27,7 @@ class HandhavingSerializer(serializers.Serializer):
     geldigTot = serializers.DateField()
 
 
-class OntheffingDetailSerializer(serializers.Serializer):
+class OntheffingResponseSerializer(serializers.Serializer):
     ontheffingsnummer = serializers.CharField(max_length=40)
     geldigVanaf = serializers.DateField()
     geldigTot = serializers.DateField()
@@ -35,4 +35,4 @@ class OntheffingDetailSerializer(serializers.Serializer):
 
 
 class OntheffingenResponseSerializer(serializers.Serializer):
-    ontheffing = OntheffingDetailSerializer(many=True)
+    ontheffing = OntheffingResponseSerializer(many=True)

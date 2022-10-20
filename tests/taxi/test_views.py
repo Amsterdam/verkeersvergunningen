@@ -53,17 +53,17 @@ class TestViews:
             {
                 "ontheffingsnummer": "8E5F8EB000EC4938BC894CA2313E9134",
                 "geldigVanaf": "2022-08-01",
-                "geldigTot": "2025-07-31",
+                "geldigTot": "2025-08-01",
                 "schorsingen": [
                     {
                         "zaakidentificatie": "1234567",
                         "geldigVanaf": "2022-08-29",
-                        "geldigTot": "2022-09-28",
+                        "geldigTot": "2022-09-29",
                     },
                     {
                         "zaakidentificatie": "1234567",
                         "geldigVanaf": "2022-09-05",
-                        "geldigTot": "2022-09-26",
+                        "geldigTot": "2022-09-27",
                     },
                 ],
             }

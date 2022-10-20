@@ -35,6 +35,16 @@ class TestViews:
             == "7CAAF40DB75A46BDB5CD5B2A948221B3"
         )
 
+    @patch("taxi.decos.DecosTaxiDriver._get_driver_decos_key", lambda *args, **kwargs: mock_driver())
+    @patch("taxi.decos.DecosTaxiDriver._get_ontheffing", lambda *args, **kwargs: mock_ontheffing_driver_empty())
+    @patch("taxi.decos.DecosTaxiDriver._get_handhavingzaken", lambda *args, **kwargs: mock_handhavingen())
+    def test_ontheffingen_bsn_not_found(self, client):
+        data = {"bsn": '123456789', "ontheffingsnummer": '1234567'}
+        url = reverse("taxi_ontheffingen_bsn")
+        response = client.post(url, data=data)
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data["ontheffing"]) == 0
+
     def test_ontheffingen_bsn_too_few_digits(self, client):
         data = {"bsn": '123', "ontheffingsnummer": '1234567'}
         url = reverse("taxi_ontheffingen_bsn")

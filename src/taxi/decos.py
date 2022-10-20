@@ -75,7 +75,7 @@ class DecosTaxiDriver(DecosTaxi):
         driver_key = self._parse_driver_key(driver_data)
         permits_data = self._get_ontheffing(driver_key=driver_key, ontheffingsnummer=ontheffingsnummer)
         driver_permits = self._parse_decos_permits(permits_data, ontheffingsnummer=ontheffingsnummer)
-        for n, permit in enumerate(driver_permits):
+        for permit in driver_permits:
             self._add_enforcement_cases_to_permit_data(permit)
         return driver_permits
 
@@ -118,7 +118,6 @@ class DecosTaxiDriver(DecosTaxi):
             zaaktype = "text45"
             ontheffingsnummer = "it_sequence"
 
-        odata_select = OdataSelectParser()
         odata_filter = OdataFilterParser()
         filters = [
             {"_eq": {DecosParams.zaaktype.value: "TAXXXI Zone-ontheffing"}},

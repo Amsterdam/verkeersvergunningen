@@ -34,6 +34,16 @@ class TestDecosTaxiParse:
         response = decos._build_url(zaaknummer=zaaknr, folder=endpoint)
         assert expected_url == response
 
+    def test_parse_datum_vanaf(self, decos):
+        decos_date = "2022-01-31T19:00:00"
+        parsed_date = decos._parse_datum_vanaf(decos_date)
+        assert parsed_date == "2022-01-31"
+
+    def test_parse_datum_tot(self, decos):
+        decos_date = "2022-01-31T19:00:00"
+        parsed_date = decos._parse_datum_tot(decos_date)
+        assert parsed_date == "2022-02-01"
+
     def test_parse_driver_key(self, decos):
         data = mock_driver()
         decos_key = decos._parse_driver_key(data)

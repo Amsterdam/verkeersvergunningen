@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timedelta
 from enum import Enum
 from odata_request_parser.main import OdataFilterParser, OdataSelectParser
 
@@ -48,8 +49,8 @@ class DecosTaxi(DecosBase):
     def _parse_enforcement_case(self, permit: dict) -> dict:
         return {
             PermitParams.zaakidentificatie.name: permit[PermitParams.zaakidentificatie.value],
-            PermitParams.geldigVanaf.name: permit["fields"][PermitParams.geldigVanaf.value].split('T')[0],
-            PermitParams.geldigTot.name: permit["fields"][PermitParams.geldigTot.value].split('T')[0],
+            PermitParams.geldigVanaf.name: self._parse_datum_tot(permit["fields"][PermitParams.geldigVanaf.value]),
+            PermitParams.geldigTot.name: self._parse_datum_tot(permit["fields"][PermitParams.geldigTot.value]),
         }
 
     def _parse_decos_permits(self, data: dict) -> list[dict]:
@@ -67,13 +68,22 @@ class DecosTaxi(DecosBase):
         data = {
             PermitParams.zaakidentificatie.name: permit[PermitParams.zaakidentificatie.value],
             PermitParams.ontheffingsnummer.name: str(int(float(fields[PermitParams.ontheffingsnummer.value]))),
-            PermitParams.geldigVanaf.name: fields[PermitParams.geldigVanaf.value].split('T')[0],
-            PermitParams.geldigTot.name: fields[PermitParams.geldigTot.value].split('T')[0],
+            PermitParams.geldigVanaf.name: self._parse_datum_vanaf(fields[PermitParams.geldigVanaf.value]),
+            PermitParams.geldigTot.name: self._parse_datum_tot(fields[PermitParams.geldigTot.value]),
         }
         return data
 
     def _build_url(self, *, zaaknummer: str, folder: str) -> str:
         return os.path.join(self.base_url, zaaknummer, folder)
+
+    def _parse_datum_vanaf(self, date_string: str) -> str:
+        dt = datetime.fromisoformat(date_string)
+        return dt.strftime('%Y-%m-%d')
+
+    def _parse_datum_tot(self, date_string: str) -> str:
+        """ De datum velden van Decos zijn 'tot en met'. Cleopatra verwacht velden als 'tot' """
+        dt = datetime.fromisoformat(date_string) + timedelta(days=1)
+        return dt.strftime('%Y-%m-%d')
 
 
 class DecosTaxiDriver(DecosTaxi):

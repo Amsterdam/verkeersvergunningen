@@ -6,7 +6,7 @@
 #
 asgiref==3.5.2
     # via django
-certifi==2022.6.15.1
+certifi==2022.9.24
     # via
     #   requests
     #   sentry-sdk
@@ -18,7 +18,7 @@ coreschema==0.0.4
     # via
     #   coreapi
     #   drf-yasg
-django==3.2.15
+django==3.2.16
     # via
     #   -r requirements.in
     #   django-basicauth
@@ -35,13 +35,13 @@ django-extensions==3.2.1
     # via -r requirements.in
 django-http-exceptions==1.4.0
     # via -r requirements.in
-djangorestframework==3.13.1
+djangorestframework==3.14.0
     # via
     #   -r requirements.in
     #   drf-yasg
-drf-yasg==1.21.3
+drf-yasg==1.21.4
     # via -r requirements.in
-idna==3.3
+idna==3.4
     # via requests
 inflection==0.5.1
     # via drf-yasg
@@ -59,7 +59,7 @@ pyparsing==3.0.9
     # via packaging
 python-dateutil==2.8.2
     # via -r requirements.in
-pytz==2022.2.1
+pytz==2022.5
     # via
     #   django
     #   djangorestframework
@@ -70,13 +70,13 @@ requests==2.28.1
     #   coreapi
 ruamel-yaml==0.17.21
     # via drf-yasg
-ruamel-yaml-clib==0.2.6
+ruamel-yaml-clib==0.2.7
     # via ruamel-yaml
-sentry-sdk==1.9.8
+sentry-sdk==1.10.1
     # via -r requirements.in
 six==1.16.0
     # via python-dateutil
-sqlparse==0.4.2
+sqlparse==0.4.3
     # via django
 uritemplate==4.1.1
     # via

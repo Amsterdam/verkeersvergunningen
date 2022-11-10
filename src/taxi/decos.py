@@ -114,6 +114,8 @@ class DecosTaxiDriver(DecosTaxi):
         return data
 
     def _parse_driver_key(self, data: dict) -> str:
+        if not data.get("content"):
+            raise HTTPExceptions.NOT_FOUND.with_content("No driver found for that BSN")
         try:
             return data["content"][0]["key"]
         except:

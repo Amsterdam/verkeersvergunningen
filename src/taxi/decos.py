@@ -82,6 +82,8 @@ class DecosTaxiDriver(DecosTaxi):
         request the permit from a driver based on their bsn nr
         """
         driver_data = self._get_driver_decos_key(driver_bsn)
+        if not driver_data.get("content"):
+            return []
         driver_key = self._parse_driver_key(driver_data)
         permits_data = self._get_ontheffing(driver_key=driver_key, ontheffingsnummer=ontheffingsnummer)
         driver_permits = self._parse_decos_permits(permits_data, ontheffingsnummer=ontheffingsnummer)
@@ -114,8 +116,6 @@ class DecosTaxiDriver(DecosTaxi):
         return data
 
     def _parse_driver_key(self, data: dict) -> str:
-        if not data.get("content"):
-            raise HTTPExceptions.NOT_FOUND.with_content("No driver found for that BSN")
         try:
             return data["content"][0]["key"]
         except:

@@ -1,7 +1,7 @@
 import os
 from datetime import datetime, timedelta
 from enum import Enum
-from odata_request_parser.main import OdataFilterParser, OdataSelectParser
+from odata_request_parser.main import OdataFilterParser
 
 from main import settings
 from main.decos import DecosBase
@@ -49,7 +49,7 @@ class DecosTaxi(DecosBase):
     def _parse_enforcement_case(self, permit: dict) -> dict:
         return {
             PermitParams.zaakidentificatie.name: permit[PermitParams.zaakidentificatie.value],
-            PermitParams.geldigVanaf.name: self._parse_datum_tot(permit["fields"][PermitParams.geldigVanaf.value]),
+            PermitParams.geldigVanaf.name: self._parse_datum_vanaf(permit["fields"][PermitParams.geldigVanaf.value]),
             PermitParams.geldigTot.name: self._parse_datum_tot(permit["fields"][PermitParams.geldigTot.value]),
         }
 
@@ -158,7 +158,7 @@ class DecosTaxiDriver(DecosTaxi):
 
 
 class DecosTaxiDetail(DecosTaxi):
-    def get_ontheffingen(self, ontheffingsnummer: str) -> list[dict]:
+    def get_ontheffingen(self, ontheffingsnummer: str) -> dict:
         data = self._get_ontheffing(ontheffingsnummer)
         if not data.get("content"):
             raise HTTPExceptions.NOT_FOUND.with_content("No data found in Decos for that query")
@@ -176,7 +176,6 @@ class DecosTaxiDetail(DecosTaxi):
             zaaktype = "text45"
             ontheffingsnummer = "it_sequence"
 
-        odata_select = OdataSelectParser()
         odata_filter = OdataFilterParser()
         filters = [
             {"_eq": {DecosParams.afgehandeld.value: "true"}},

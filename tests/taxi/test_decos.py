@@ -139,8 +139,9 @@ class TestDecosTaxiRequests:
 
         request_url = (
             BASE_URL
-            + DecosZaaknummers.handhavingszaken.value
-            + f"/FOLDERS?properties=false&fetchParents=false&relTypeKey={ontheffingsnr}"
+            + ontheffingsnr
+            + f"/FOLDERS?properties=false&fetchParents=false&relTypeKey=FOLDERFOLDEREQU"
+              f"&oDataQuery.filter=parentkey%20eq%20%27{DecosZaaknummers.handhavingszaken.value}%27"
         )
         self._assert_correct_url(request_url)
 
@@ -162,7 +163,7 @@ class TestDecosTaxiResponse:
         ]
         driver_permits = decos.get_ontheffingen(driver_bsn=bsn, ontheffingsnummer=ontheffingsnummer)
         assert len(driver_permits) == 1
-        assert len(driver_permits[0]["schorsingen"]) == 2
+        assert len(driver_permits[0]["schorsingen"]) == 1
 
     @patch("taxi.decos.DecosTaxiDriver._get_response")
     def test_get_ontheffing_driver_empty(self, mocked_response, decos):
@@ -180,7 +181,7 @@ class TestDecosTaxiResponse:
             MockResponse(200, mock_handhavingen()),
         ]
         permit = decos_detail.get_ontheffingen(ontheffingsnummer="123")
-        assert len(permit["schorsingen"]) == 2
+        assert len(permit["schorsingen"]) == 1
 
     @patch("taxi.decos.DecosTaxiDetail._get_response")
     def test_get_ontheffing_detail_empty(self, mocked_response, decos_detail):

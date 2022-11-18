@@ -24,13 +24,19 @@ class DecosTaxi(DecosBase):
         get the enforcement cases from the driver based on the drivers key
         "handhaving" is synonymous for "schorsing" in this code
         """
+        class DecosParams(Enum):
+            parent_key = "parentkey"
+
+        odata_filter = OdataFilterParser()
+        filters = [{"_eq": {DecosParams.parent_key.value: DecosZaaknummers.handhavingszaken.value}}]
         parameters = {
             "properties": "false",
             "fetchParents": "false",
-            "relTypeKey": permit_decos_key,
+            "relTypeKey": "FOLDERFOLDEREQU",
+            "oDataQuery.filter": odata_filter.parse(filters),
         }
         url = self._build_url(
-            zaaknummer=DecosZaaknummers.handhavingszaken.value,
+            zaaknummer=permit_decos_key,
             folder=DecosFolders.folders.value,
         )
         data = self._get(url, parameters)

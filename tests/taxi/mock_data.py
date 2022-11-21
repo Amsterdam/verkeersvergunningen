@@ -95,35 +95,31 @@ def mock_ontheffing_detail_empty():
 
 def mock_handhavingen():
     # curl -u 'DATAPUNT\API_TAXXXI:xxx' -H "accept:application/itemdata"
-    # "https://decosdvl.acc.amsterdam.nl/decosweb/aspx/api/v1/items/
-    # 496E3E505C4045BAB5286B56CF2FC89E/FOLDERS?relTypeKey=8E5F8EB000EC4938BC894CA2313E9134"
+    # "https://decosdvl.acc.amsterdam.nl/decosweb/aspx/api/v1/items/F32F12909C7A4290AA692755D2449FA8/FOLDERS
+    # ?properties=false&relTypeKey=FOLDERFOLDEREQU&fetchParents=false
+    # &oDataQuery.filter=parentkey%20eq%20'496E3E505C4045BAB5286B56CF2FC89E'"
     return {
-        "count": 2,
+        "count": 1,
         "content": [
             {
                 "key": "7CAAF40DB75A46BDB5CD5B2A948221B3",
                 "fields": {
-                    "sequence": 1979535.0,
-                    "mark": "Z/22/1979535",
-                    "subject1": "Geen daklicht",
-                    "processed": True,
-                    "text45": "Taxxxi handhaving",
-                    "date6": "2022-08-29T00:00:00",
-                    "date7": "2022-09-28T00:00:00",
+                    "archived": False,
+                    "date6": "2022-11-03T00:00:00",
+                    "date7": "2022-11-18T00:00:00",
                     "dfunction": "Schorsen",
-                },
-            },
-            {
-                "key": "C06C49DC3BAA48E7A38C0D11F97D9770",
-                "fields": {
-                    "sequence": 1979576.0,
-                    "mark": "Z/22/1979576",
-                    "subject1": "Geen ID",
+                    "initials": "_",
+                    "parentKey": "496E3E505C4045BAB5286B56CF2FC89E",
+                    "sequence": 1.0,
+                    "itemtype_key": "FOLDER",
+                    "mailaddress": "Levi en van Ritesh 172",
+                    "mark": "Z/22/1979943",
+                    "num2": 130329104.00,
                     "processed": True,
                     "text45": "Taxxxi handhaving",
-                    "date6": "2022-09-05T00:00:00",
-                    "date7": "2022-09-26T00:00:00",
-                },
-            },
-        ],
+                    "num22": 2022.00,
+                    "itemrel_key": "D6459F9985114847ADC0EAB21835445E",
+                }
+            }
+        ]
     }

@@ -1,4 +1,17 @@
-FROM amsterdam/python:3.9-buster as app
+FROM python:3.9-buster as app
+MAINTAINER datapunt@amsterdam.nl
+
+ENV PYTHONUNBUFFERED 1 \
+    PIP_NO_CACHE_DIR=off
+
+RUN apt-get update \
+ && apt-get dist-upgrade -y \
+ && apt-get install --no-install-recommends -y \
+        gdal-bin \
+        postgresql-client-11 \
+ && pip install --upgrade pip \
+ && pip install uwsgi \
+ && useradd --user-group --system datapunt
 
 WORKDIR /app/install
 COPY requirements.txt requirements.txt

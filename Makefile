@@ -67,3 +67,7 @@ clean:                              ## Clean docker stuff
 
 env:                                ## Print current env
 	env | sort
+
+trivy: 								## Detect image vulnerabilities
+	$(dc) build app
+	trivy image --ignore-unfixed docker-registry.secure.amsterdam.nl/datapunt/verkeersvergunningen

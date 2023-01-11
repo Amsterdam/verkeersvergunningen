@@ -12,3 +12,5 @@ django-braces
 drf-yasg
 odata-request-parser  # Deze library wordt door ons beheerd: https://github.com/Amsterdam/odata_request_parser
 django-http-exceptions
+certifi>=2022.12.07  # Without this pin a lower version of certifi is installed, which poses a security vulnerability
+setuptools>=65.5.1 # Without this pin a lower version of setuptools is installed, which poses a security vulnerability

@@ -19,7 +19,7 @@ coreschema==0.0.4
     # via
     #   coreapi
     #   drf-yasg
-django==3.2.16
+django==3.2.18
     # via
     #   -r requirements.in
     #   django-basicauth
@@ -40,7 +40,7 @@ djangorestframework==3.14.0
     # via
     #   -r requirements.in
     #   drf-yasg
-drf-yasg==1.21.4
+drf-yasg==1.21.5
     # via -r requirements.in
 idna==3.4
     # via requests
@@ -50,7 +50,7 @@ itypes==1.2.0
     # via coreapi
 jinja2==3.1.2
     # via coreschema
-markupsafe==2.1.1
+markupsafe==2.1.2
     # via jinja2
 odata-request-parser==0.2
     # via -r requirements.in
@@ -71,7 +71,7 @@ ruamel-yaml==0.17.21
     # via drf-yasg
 ruamel-yaml-clib==0.2.7
     # via ruamel-yaml
-sentry-sdk==1.13.0
+sentry-sdk==1.15.0
     # via -r requirements.in
 six==1.16.0
     # via python-dateutil
@@ -87,5 +87,5 @@ urllib3==1.26.14
     #   sentry-sdk
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==66.0.0
+setuptools==67.4.0
     # via -r requirements.in

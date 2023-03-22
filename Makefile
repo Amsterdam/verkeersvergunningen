@@ -55,7 +55,7 @@ shell:                              ## Run shell_plus and print sql
 dev: 						        ## Run the development app (and run extra migrations first)
 	$(run) --service-ports dev
 
-test:                               ## Execute tests
+test: lint                               ## Execute tests
 	$(dc) run --rm test pytest /app/tests $(ARGS)
 
 parser_telcameras_v2:
@@ -73,3 +73,13 @@ env:                                ## Print current env
 trivy: 								## Detect image vulnerabilities
 	$(dc) build --no-cache app
 	trivy image --ignore-unfixed docker-registry.secure.amsterdam.nl/datapunt/verkeersvergunningen
+
+lintfix:                            ## Execute lint fixes
+	$(run) test black /app/src/$(APP) /app/tests/$(APP)
+	$(run) test autoflake /app --recursive --in-place --remove-unused-variables --remove-all-unused-imports --quiet
+	$(run) test isort /app/src/$(APP) /app/tests/$(APP)
+
+
+lint:                               ## Execute lint checks
+	$(run) test autoflake /app --check --recursive --quiet
+	$(run) test isort --diff --check /app/src/$(APP) /app/tests/$(APP)

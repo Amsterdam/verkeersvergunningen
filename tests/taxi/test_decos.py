@@ -1,17 +1,16 @@
-from requests import Request
-
-import pytest
-
 from unittest.mock import patch
 
-import taxi
-from taxi.serializers import OntheffingResponseSerializer, HandhavingSerializer
-from .mock_data import *
+import pytest
+from django_http_exceptions import HTTPExceptions
+from requests import Request
 
+import taxi
 from taxi.decos import DecosTaxi, DecosTaxiDetail, DecosTaxiDriver
 from taxi.enums import DecosZaaknummers
+from taxi.serializers import HandhavingSerializer, OntheffingResponseSerializer
+
 from ..utils import MockResponse
-from django_http_exceptions import HTTPExceptions
+from .mock_data import *
 
 BASE_URL = DecosTaxi.base_url
 
@@ -30,7 +29,10 @@ class TestDecosTaxiParse:
     def test_build_url(self, decos):
         zaaknr = "12345"
         endpoint = "my-endpoint"
-        expected_url = f"https://decosdvl.acc.amsterdam.nl/decosweb/aspx/" f"api/v1/items/{zaaknr}/{endpoint}"
+        expected_url = (
+            f"https://decosdvl.acc.amsterdam.nl/decosweb/aspx/"
+            f"api/v1/items/{zaaknr}/{endpoint}"
+        )
         response = decos._build_url(zaaknummer=zaaknr, folder=endpoint)
         assert expected_url == response
 
@@ -96,7 +98,9 @@ class TestDecosTaxiRequests:
         decos._get_driver_decos_key(driver_bsn=bsn)
 
         request_url = (
-            BASE_URL + DecosZaaknummers.bsn.value + "/TAXXXI?properties=false&fetchParents=false&"
+            BASE_URL
+            + DecosZaaknummers.bsn.value
+            + "/TAXXXI?properties=false&fetchParents=false&"
             "oDataQuery.select=num1&oDataQuery.filter=num1%20eq%20%27233090125%27"
         )
         self._assert_correct_url(request_url)
@@ -125,7 +129,9 @@ class TestDecosTaxiRequests:
 
         # Check if the prepared url is correct
         request_url = (
-            BASE_URL + DecosZaaknummers.zone_ontheffing.value + "/FOLDERS?properties=false&fetchParents=false&"
+            BASE_URL
+            + DecosZaaknummers.zone_ontheffing.value
+            + "/FOLDERS?properties=false&fetchParents=false&"
             "oDataQuery.filter=processed%20eq%20%27true%27%20and%20it_sequence%20eq%20%271978110%27"
         )
         self._assert_correct_url(request_url)
@@ -141,7 +147,7 @@ class TestDecosTaxiRequests:
             BASE_URL
             + ontheffingsnr
             + f"/FOLDERS?properties=false&fetchParents=false&relTypeKey=FOLDERFOLDEREQU"
-              f"&oDataQuery.filter=parentkey%20eq%20%27{DecosZaaknummers.handhavingszaken.value}%27"
+            f"&oDataQuery.filter=parentkey%20eq%20%27{DecosZaaknummers.handhavingszaken.value}%27"
         )
         self._assert_correct_url(request_url)
 
@@ -161,7 +167,9 @@ class TestDecosTaxiResponse:
             MockResponse(200, mock_ontheffing_driver()),
             MockResponse(200, mock_handhavingen()),
         ]
-        driver_permits = decos.get_ontheffingen(driver_bsn=bsn, ontheffingsnummer=ontheffingsnummer)
+        driver_permits = decos.get_ontheffingen(
+            driver_bsn=bsn, ontheffingsnummer=ontheffingsnummer
+        )
         assert len(driver_permits) == 1
         assert len(driver_permits[0]["schorsingen"]) == 1
 
@@ -171,7 +179,9 @@ class TestDecosTaxiResponse:
             MockResponse(200, mock_driver()),
             MockResponse(200, mock_ontheffing_driver_empty()),
         ]
-        driver_permits = decos.get_ontheffingen(driver_bsn="123", ontheffingsnummer="123")
+        driver_permits = decos.get_ontheffingen(
+            driver_bsn="123", ontheffingsnummer="123"
+        )
         assert len(driver_permits) == 0
 
     @patch("taxi.decos.DecosTaxiDetail._get_response")

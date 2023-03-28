@@ -56,6 +56,7 @@ FROM dev as tests
 USER datapunt
 WORKDIR /app/tests
 ADD tests .
+COPY pyproject.toml /app/.
 
 ENV COVERAGE_FILE=/tmp/.coverage
 ENV PYTHONPATH=/app/src

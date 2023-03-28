@@ -6,12 +6,13 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from main.authentication import BasicAuthWithKeys
+from taxi.decos import DecosTaxiDetail, DecosTaxiDriver
 from taxi.serializers import (
     OntheffingenRequestSerializer,
-    OntheffingenResponseSerializer, OntheffingResponseSerializer,
+    OntheffingenResponseSerializer,
+    OntheffingResponseSerializer,
 )
-from main.authentication import BasicAuthWithKeys
-from taxi.decos import DecosTaxiDriver, DecosTaxiDetail
 
 log = logging.getLogger(__name__)
 
@@ -22,7 +23,9 @@ class OntheffingenBSNView(CsrfExemptMixin, APIView):
 
     @swagger_auto_schema(
         request_body=OntheffingenRequestSerializer,
-        responses={200: OntheffingenResponseSerializer},  # TODO:Define more responses here
+        responses={
+            200: OntheffingenResponseSerializer
+        },  # TODO:Define more responses here
     )
     def post(self, request: HttpRequest):
         """
@@ -35,7 +38,9 @@ class OntheffingenBSNView(CsrfExemptMixin, APIView):
         bsn = serializer.validated_data["bsn"]
         ontheffingsnummer = serializer.validated_data["ontheffingsnummer"]
         decos = DecosTaxiDriver()
-        data = decos.get_ontheffingen(driver_bsn=bsn, ontheffingsnummer=ontheffingsnummer)
+        data = decos.get_ontheffingen(
+            driver_bsn=bsn, ontheffingsnummer=ontheffingsnummer
+        )
         response_serializer = OntheffingenResponseSerializer(data={"ontheffing": data})
         response_serializer.is_valid(raise_exception=True)
         return Response(response_serializer.data)
@@ -46,7 +51,9 @@ class OntheffingDetailView(CsrfExemptMixin, APIView):
     authentication_classes = [BasicAuthWithKeys]
 
     @swagger_auto_schema(
-        responses={200: OntheffingResponseSerializer},  # TODO:Define more responses here
+        responses={
+            200: OntheffingResponseSerializer
+        },  # TODO:Define more responses here
     )
     def get(self, request, ontheffingsnummer: str):
         """

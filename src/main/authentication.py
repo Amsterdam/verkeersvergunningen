@@ -9,15 +9,22 @@ log = logging.getLogger(__name__)
 
 class BasicAuthWithKeys(authentication.BaseAuthentication):
     def authenticate(self, request):
-        basic_credentials = request.META.get('HTTP_AUTHORIZATION')
+        basic_credentials = request.META.get("HTTP_AUTHORIZATION")
         if not basic_credentials:
-            raise exceptions.AuthenticationFailed('No such user')
+            raise exceptions.AuthenticationFailed("No such user")
 
         try:
-            (username, passw) = base64.b64decode(basic_credentials.replace('Basic ', '')).decode("utf-8").split(':')
-            if username != settings.CLEOPATRA_BASIC_AUTH_USER or passw != settings.CLEOPATRA_BASIC_AUTH_PASS:
-                raise exceptions.AuthenticationFailed('No such user')
-        except Exception as e:
-            raise exceptions.AuthenticationFailed('No such user')
+            (username, passw) = (
+                base64.b64decode(basic_credentials.replace("Basic ", ""))
+                .decode("utf-8")
+                .split(":")
+            )
+            if (
+                username != settings.CLEOPATRA_BASIC_AUTH_USER
+                or passw != settings.CLEOPATRA_BASIC_AUTH_PASS
+            ):
+                raise exceptions.AuthenticationFailed("No such user")
+        except Exception:
+            raise exceptions.AuthenticationFailed("No such user")
 
-        return ('user', None)
+        return ("user", None)

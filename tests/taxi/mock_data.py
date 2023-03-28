@@ -119,7 +119,7 @@ def mock_handhavingen():
                     "text45": "Taxxxi handhaving",
                     "num22": 2022.00,
                     "itemrel_key": "D6459F9985114847ADC0EAB21835445E",
-                }
+                },
             }
-        ]
+        ],
     }

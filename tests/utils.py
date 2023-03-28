@@ -1,8 +1,8 @@
+import json
 from json import JSONDecodeError
-from requests import JSONDecodeError as RequestsJSONDecodeError
 
 from requests import HTTPError
-import json
+from requests import JSONDecodeError as RequestsJSONDecodeError
 
 
 class MockResponse:
@@ -22,5 +22,5 @@ class MockResponse:
             raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
 
     def raise_for_status(self):
-        if str(self.status_code) != '200':
+        if str(self.status_code) != "200":
             raise HTTPError(str(self.status_code), response=self)

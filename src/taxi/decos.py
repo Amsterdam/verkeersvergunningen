@@ -1,12 +1,13 @@
 import os
 from datetime import datetime, timedelta
 from enum import Enum
+
+from django_http_exceptions import HTTPExceptions
 from odata_request_parser.main import OdataFilterParser
 
 from main import settings
 from main.decos import DecosBase
 from taxi.enums import DecosFolders, DecosZaaknummers, PermitParams
-from django_http_exceptions import HTTPExceptions
 
 
 class DecosTaxi(DecosBase):
@@ -24,11 +25,18 @@ class DecosTaxi(DecosBase):
         get the enforcement cases from the driver based on the drivers key
         "handhaving" is synonymous for "schorsing" in this code
         """
+
         class DecosParams(Enum):
             parent_key = "parentkey"
 
         odata_filter = OdataFilterParser()
-        filters = [{"_eq": {DecosParams.parent_key.value: DecosZaaknummers.handhavingszaken.value}}]
+        filters = [
+            {
+                "_eq": {
+                    DecosParams.parent_key.value: DecosZaaknummers.handhavingszaken.value
+                }
+            }
+        ]
         parameters = {
             "properties": "false",
             "fetchParents": "false",
@@ -45,27 +53,42 @@ class DecosTaxi(DecosBase):
     def _parse_decos_enforcement_cases(self, data: dict) -> list[dict]:
         try:
             parsed_permits = [
-                self._parse_enforcement_case(permit)
-                for permit in data["content"]
+                self._parse_enforcement_case(permit) for permit in data["content"]
             ]
             return parsed_permits
         except KeyError:
-            raise HTTPExceptions.NOT_IMPLEMENTED.with_content("Could not parse the handhaving from Decos")
+            raise HTTPExceptions.NOT_IMPLEMENTED.with_content(
+                "Could not parse the handhaving from Decos"
+            )
 
     def _parse_enforcement_case(self, permit: dict) -> dict:
         return {
-            PermitParams.zaakidentificatie.name: permit[PermitParams.zaakidentificatie.value],
-            PermitParams.geldigVanaf.name: self._parse_datum_vanaf(permit["fields"][PermitParams.geldigVanaf.value]),
-            PermitParams.geldigTot.name: self._parse_datum_tot(permit["fields"][PermitParams.geldigTot.value]),
+            PermitParams.zaakidentificatie.name: permit[
+                PermitParams.zaakidentificatie.value
+            ],
+            PermitParams.geldigVanaf.name: self._parse_datum_vanaf(
+                permit["fields"][PermitParams.geldigVanaf.value]
+            ),
+            PermitParams.geldigTot.name: self._parse_datum_tot(
+                permit["fields"][PermitParams.geldigTot.value]
+            ),
         }
 
     def _parse_permit(self, permit: dict) -> dict:
         fields = permit["fields"]
         data = {
-            PermitParams.zaakidentificatie.name: permit[PermitParams.zaakidentificatie.value],
-            PermitParams.ontheffingsnummer.name: str(int(float(fields[PermitParams.ontheffingsnummer.value]))),
-            PermitParams.geldigVanaf.name: self._parse_datum_vanaf(fields[PermitParams.geldigVanaf.value]),
-            PermitParams.geldigTot.name: self._parse_datum_tot(fields[PermitParams.geldigTot.value]),
+            PermitParams.zaakidentificatie.name: permit[
+                PermitParams.zaakidentificatie.value
+            ],
+            PermitParams.ontheffingsnummer.name: str(
+                int(float(fields[PermitParams.ontheffingsnummer.value]))
+            ),
+            PermitParams.geldigVanaf.name: self._parse_datum_vanaf(
+                fields[PermitParams.geldigVanaf.value]
+            ),
+            PermitParams.geldigTot.name: self._parse_datum_tot(
+                fields[PermitParams.geldigTot.value]
+            ),
         }
         return data
 
@@ -74,16 +97,18 @@ class DecosTaxi(DecosBase):
 
     def _parse_datum_vanaf(self, date_string: str) -> str:
         dt = datetime.fromisoformat(date_string)
-        return dt.strftime('%Y-%m-%d')
+        return dt.strftime("%Y-%m-%d")
 
     def _parse_datum_tot(self, date_string: str) -> str:
-        """ De datum velden van Decos zijn 'tot en met'. Cleopatra verwacht velden als 'tot' """
+        """De datum velden van Decos zijn 'tot en met'. Cleopatra verwacht velden als 'tot'"""
         dt = datetime.fromisoformat(date_string) + timedelta(days=1)
-        return dt.strftime('%Y-%m-%d')
+        return dt.strftime("%Y-%m-%d")
 
 
 class DecosTaxiDriver(DecosTaxi):
-    def get_ontheffingen(self, *, driver_bsn: str, ontheffingsnummer: str) -> list[dict]:
+    def get_ontheffingen(
+        self, *, driver_bsn: str, ontheffingsnummer: str
+    ) -> list[dict]:
         """
         request the permit from a driver based on their bsn nr
         """
@@ -91,8 +116,12 @@ class DecosTaxiDriver(DecosTaxi):
         if not driver_data.get("content"):
             return []
         driver_key = self._parse_driver_key(driver_data)
-        permits_data = self._get_ontheffing(driver_key=driver_key, ontheffingsnummer=ontheffingsnummer)
-        driver_permits = self._parse_decos_permits(permits_data, ontheffingsnummer=ontheffingsnummer)
+        permits_data = self._get_ontheffing(
+            driver_key=driver_key, ontheffingsnummer=ontheffingsnummer
+        )
+        driver_permits = self._parse_decos_permits(
+            permits_data, ontheffingsnummer=ontheffingsnummer
+        )
         for permit in driver_permits:
             self._add_enforcement_cases_to_permit_data(permit)
         return driver_permits
@@ -125,7 +154,9 @@ class DecosTaxiDriver(DecosTaxi):
         try:
             return data["content"][0]["key"]
         except:
-            raise HTTPExceptions.NOT_IMPLEMENTED.with_content("Could not parse the response from Decos")
+            raise HTTPExceptions.NOT_IMPLEMENTED.with_content(
+                "Could not parse the response from Decos"
+            )
 
     def _get_ontheffing(self, *, driver_key: str, ontheffingsnummer: str):
         class DecosParams(Enum):
@@ -156,18 +187,24 @@ class DecosTaxiDriver(DecosTaxi):
         try:
             parsed_permits = []
             for permit in data["content"]:
-                permit["fields"].update({PermitParams.ontheffingsnummer.value: ontheffingsnummer})
+                permit["fields"].update(
+                    {PermitParams.ontheffingsnummer.value: ontheffingsnummer}
+                )
                 parsed_permits.append(self._parse_permit(permit))
             return parsed_permits
         except KeyError as e:
-            raise HTTPExceptions.NOT_IMPLEMENTED.with_content("Could not parse the ontheffing from Decos") from e
+            raise HTTPExceptions.NOT_IMPLEMENTED.with_content(
+                "Could not parse the ontheffing from Decos"
+            ) from e
 
 
 class DecosTaxiDetail(DecosTaxi):
     def get_ontheffingen(self, ontheffingsnummer: str) -> dict:
         data = self._get_ontheffing(ontheffingsnummer)
         if not data.get("content"):
-            raise HTTPExceptions.NOT_FOUND.with_content("No data found in Decos for that query")
+            raise HTTPExceptions.NOT_FOUND.with_content(
+                "No data found in Decos for that query"
+            )
         detail_permits = self._parse_decos_permits(data)
         permit = detail_permits[0]
         self._add_enforcement_cases_to_permit_data(permit)
@@ -201,10 +238,9 @@ class DecosTaxiDetail(DecosTaxi):
 
     def _parse_decos_permits(self, data: dict) -> list[dict]:
         try:
-            parsed_permits = [
-                self._parse_permit(permit)
-                for permit in data["content"]
-            ]
+            parsed_permits = [self._parse_permit(permit) for permit in data["content"]]
             return parsed_permits
         except KeyError as e:
-            raise HTTPExceptions.NOT_IMPLEMENTED.with_content("Could not parse the ontheffing from Decos") from e
+            raise HTTPExceptions.NOT_IMPLEMENTED.with_content(
+                "Could not parse the ontheffing from Decos"
+            ) from e

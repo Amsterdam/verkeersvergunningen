@@ -14,7 +14,7 @@ black==23.3.0
     # via -r requirements_dev.in
 build==0.10.0
     # via pip-tools
-certifi==2022.12.7
+certifi==2023.5.7
     # via
     #   -r ./requirements.txt
     #   requests
@@ -38,7 +38,7 @@ coreschema==0.0.4
     #   drf-yasg
 coverage[toml]==7.2.5
     # via pytest-cov
-django==4.2
+django==4.2.1
     # via
     #   -r ./requirements.txt
     #   django-basicauth
@@ -101,7 +101,7 @@ pathspec==0.11.1
     # via black
 pip-tools==6.13.0
     # via -r requirements_dev.in
-platformdirs==3.5.0
+platformdirs==3.5.1
     # via black
 pluggy==1.0.0
     # via pytest
@@ -128,15 +128,19 @@ pytz==2023.3
     #   -r ./requirements.txt
     #   djangorestframework
     #   drf-yasg
-requests==2.29.0
+requests==2.30.0
     # via
     #   -r ./requirements.txt
     #   coreapi
-ruamel-yaml==0.17.22
+ruamel-yaml==0.17.26
     # via
     #   -r ./requirements.txt
     #   drf-yasg
-sentry-sdk==1.21.1
+ruamel-yaml-clib==0.2.7
+    # via
+    #   -r ./requirements.txt
+    #   ruamel-yaml
+sentry-sdk==1.22.2
     # via -r ./requirements.txt
 six==1.16.0
     # via
@@ -156,7 +160,7 @@ urllib3==1.26.15
     #   -r ./requirements.txt
     #   requests
     #   sentry-sdk
-werkzeug==2.3.3
+werkzeug==2.3.4
     # via -r requirements_dev.in
 wheel==0.40.0
     # via pip-tools

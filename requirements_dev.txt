@@ -19,7 +19,7 @@ certifi==2023.7.22
     #   -r ./requirements.txt
     #   requests
     #   sentry-sdk
-charset-normalizer==3.2.0
+charset-normalizer==3.3.0
     # via
     #   -r ./requirements.txt
     #   requests
@@ -135,7 +135,7 @@ tomli==2.0.1
     #   pip-tools
     #   pyproject-hooks
     #   pytest
-typing-extensions==4.7.1
+typing-extensions==4.8.0
     # via
     #   -r ./requirements.txt
     #   asgiref
@@ -144,12 +144,12 @@ uritemplate==4.1.1
     # via
     #   -r ./requirements.txt
     #   drf-yasg
-urllib3==2.0.4
+urllib3==2.0.5
     # via
     #   -r ./requirements.txt
     #   requests
     #   sentry-sdk
-werkzeug==2.3.7
+werkzeug==3.0.0
     # via -r requirements_dev.in
 wheel==0.41.2
     # via pip-tools

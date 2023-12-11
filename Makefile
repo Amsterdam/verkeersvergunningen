@@ -97,10 +97,10 @@ lint:                               ## Execute lint checks
 	$(run) test isort --diff --check /app/src/$(APP) /app/tests/$(APP)
 
 deploy: manifests
-	helm upgrade --install ssr-backend $(HELM_ARGS) $(ARGS)
+	helm upgrade --install backend $(HELM_ARGS) $(ARGS)
 
 manifests:
-	@helm template ssr-backend $(HELM_ARGS) $(ARGS)
+	@helm template backend $(HELM_ARGS) $(ARGS)
 
 update-chart:
 	rm -rf manifests/chart

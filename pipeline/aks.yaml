@@ -38,22 +38,22 @@ extends:
       namespace: ns-ccc-opdr-ont-01-verkeersvergunningen
       kubernetesServiceConnection: SCN-K8S-ns-ccc-opdr-ont-01-verkeersvergunningen
       preSteps:
-        - script: helm uninstall ssr-backend -n ns-ccc-opdr-ont-01-verkeersvergunningen || true
+        - script: helm uninstall backend -n ns-ccc-opdr-ont-01-verkeersvergunningen || true
     test:
       pool: Opdrachten
       namespace: ns-ccc-opdr-tst-01-verkeersvergunningen
       kubernetesServiceConnection: SCN-K8S-ns-ccc-opdr-tst-01-verkeersvergunningen
       preSteps:
-        - script: helm uninstall ssr-backend -n ns-ccc-opdr-tst-01-verkeersvergunningen || true
+        - script: helm uninstall backend -n ns-ccc-opdr-tst-01-verkeersvergunningen || true
     acc:
       pool: Opdrachten
       namespace: ns-ccc-opdr-acc-01-verkeersvergunningen
       kubernetesServiceConnection: SCN-K8S-ns-ccc-opdr-acc-01-verkeersvergunningen
       preSteps:
-        - script: helm uninstall ssr-backend -n ns-ccc-opdr-acc-01-verkeersvergunningen || true
+        - script: helm uninstall backend -n ns-ccc-opdr-acc-01-verkeersvergunningen || true
     prod:
       pool: Opdrachten
       namespace: ns-ccc-opdr-prd-01-verkeersvergunningen
       kubernetesServiceConnection: SCN-K8S-ns-ccc-opdr-prd-01-verkeersvergunningen
       preSteps:
-        - script: helm uninstall ssr-backend -n ns-ccc-opdr-prd-01-verkeersvergunningen || true
+        - script: helm uninstall backend -n ns-ccc-opdr-prd-01-verkeersvergunningen || true

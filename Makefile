@@ -2,7 +2,7 @@
 # https://git.datapunt.amsterdam.nl/Datapunt/python-best-practices/blob/master/dependency_management/
 #
 # VERSION = 2020.01.29
-.PHONY: app
+.PHONY: help pip-tools install requirements update test init manifests deploy
 
 UID:=$(shell id --user)
 GID:=$(shell id --group)

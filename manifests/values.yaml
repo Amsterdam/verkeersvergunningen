@@ -1,0 +1,94 @@
+image:
+  registry: saks01weuacrpgpgo5qvmwo.azurecr.io
+  repository: opdrachten/verkeersvergunningen
+  tag: latest
+
+labels:
+  app: verkeersvergunningen
+
+network:
+  allow-ingress:
+    annotations:
+      helm.sh/hook-weight: "-5"
+    selector: app == 'meetbouten'
+    ingress:
+      - action: Allow
+    egress:
+      - action: Allow
+
+secrets:
+  certificate:
+    type: keyvault
+    tls: verkeersvergunningen
+
+  vault:
+    type: keyvault
+    annotations:
+      helm.sh/hook-weight: "-5"
+    secrets:
+      - secret-key
+
+  certificate-init:
+    secrets:
+      - certificate
+    annotations:
+      helm.sh/hook: post-install,post-upgrade
+    containers:
+      - name: main
+        command:
+          - sleep
+        args:
+          - "1"
+
+deployments:
+  app:
+    selectorLabels:
+      component: app
+    autoscale:
+      cpu: 70
+    resources:
+      requests:
+        cpu: 100m
+        memory: "128Mi"
+      limits:
+        cpu: 200m
+        memory: "256Mi"
+    containers:
+      - name: main
+        secrets:
+          - vault
+        ports:
+          - port: 8000
+            name: http
+        securityContext:
+          runAsUser: 1001
+
+services:
+  app:
+    ports:
+      - name: http
+        port: 80
+        targetPort: 8000
+    selector:
+      component: app
+
+ingress:
+  app:
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    paths:
+    - path: /
+      service: app
+      port: 80
+    className: nginx-internal
+    tls: certificate
+
+  app-motiv:
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    paths:
+    - path: /
+      service: app
+      port: 80
+    className: nginx-internal
+    tls: certificate

@@ -1,0 +1,25 @@
+host: localhost
+
+jobs:
+  certificate-init:
+    enabled: false
+
+ingress:
+  app:
+    tls: null
+    className: nginx
+
+secrets:
+  certificate:
+    enabled: false
+
+  database:
+    type: opaque
+    secrets:
+      database-host: database
+      database-name: postgres
+      database-user: postgres
+
+network:
+  allow-ingress:
+    enabled: false

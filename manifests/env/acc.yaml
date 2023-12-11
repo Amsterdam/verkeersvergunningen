@@ -1,0 +1,24 @@
+tenantId: 72fca1b1-2c2e-4376-a445-294d80196804  # Global
+
+# Default keyvault for getting secrets
+keyVaultName: verkeersvergunni-a-5h45r  # App specific
+
+# Identity AppID (clientId) used to authenticate with the keyvault
+workloadIdentity: 3358b5fc-a3aa-4725-9cc3-7ce3f0020eae  # Environment specific
+
+# We must select the nodepool to run the pods on
+nodepool: cccopdracc01  # Environment specific
+
+# Default host for the ingress resources
+host: verkeersvergunningen.opdr-a.azure.amsterdam.nl  # App specific
+
+# Specify the keyvault that has the certificate
+secrets:
+  certificate:
+    keyVaultName: shared-a-uibe5ahqv3cwo  # Environment specific
+
+ingress:
+  app:
+    enabled: true
+  app-motiv:
+    host: acc.verkeersvergunningen.amsterdam.nl

@@ -1,4 +1,4 @@
-FROM python:3.9-buster as app
+FROM python:3.12-bookworm as app
 MAINTAINER datapunt@amsterdam.nl
 
 ENV PYTHONUNBUFFERED 1 \

@@ -2,26 +2,15 @@
 # https://git.datapunt.amsterdam.nl/Datapunt/python-best-practices/blob/master/dependency_management/
 #
 # VERSION = 2020.01.29
-.PHONY: help pip-tools install requirements update test init manifests deploy
+.PHONY: help pip-tools install requirements update test init
 
 UID:=$(shell id --user)
 GID:=$(shell id --group)
-
-ENVIRONMENT ?= local
-VERSION ?= latest
-REGISTRY ?= localhost:5000
-REPOSITORY ?= opdrachten/sensorenregister-api
 
 dc = docker compose
 run = $(dc) run --rm -u ${UID}:${GID}
 manage = $(run) dev python manage.py
 pytest = $(run) test pytest $(ARGS)
-
-HELM_ARGS = manifests/chart \
-	-f manifests/values.yaml \
-	-f manifests/env/${ENVIRONMENT}.yaml \
-	--set image.tag=${VERSION}\
-	--set image.registry=${REGISTRY}
 
 help:                               ## Show this help.
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
@@ -95,14 +84,3 @@ lintfix:                            ## Execute lint fixes
 lint:                               ## Execute lint checks
 	$(run) test autoflake /app --check --recursive --quiet
 	$(run) test isort --diff --check /app/src/$(APP) /app/tests/$(APP)
-
-deploy: manifests
-	helm upgrade --install backend $(HELM_ARGS) $(ARGS)
-
-manifests:
-	@helm template backend $(HELM_ARGS) $(ARGS)
-
-update-chart:
-	rm -rf manifests/chart
-	git clone --branch 1.8.0 --depth 1 git@github.com:Amsterdam/helm-application.git manifests/chart
-	rm -rf manifests/chart/.git

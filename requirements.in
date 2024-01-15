@@ -1,16 +1,25 @@
 # Define all requirements, only pin when necessary (and if so, add a comment explaining why).
 # See # https://git.datapunt.amsterdam.nl/Datapunt/python-best-practices/blob/master/dependency_management/
 
-django
 sentry-sdk
-django_extensions
-django-basicauth
+raven
 requests
-python-dateutil
-djangorestframework
-django-braces
-drf-yasg
 odata-request-parser  # Deze library wordt door ons beheerd: https://github.com/Amsterdam/odata_request_parser
-django-http-exceptions
 certifi  # Without this a lower version of certifi is installed, which poses a security vulnerability
 setuptools # Without this a lower version of setuptools is installed, which poses a security vulnerability
+python-dateutil
+
+# Django
+django
+django_extensions
+django-basicauth
+djangorestframework
+django-braces
+django-http-exceptions
+drf-yasg
+
+# Azure
+opencensus-ext-django
+opencensus-ext-azure
+opencensus-ext-logging
+opencensus-ext-requests

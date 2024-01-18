@@ -16,6 +16,7 @@ class DecosBase:
         """
         Generate a get requests for the given Url and parameters
         """
+        log.info(f"Fetching data from Decos: {url}")
         try:
             parsed_params = urllib.parse.urlencode(
                 parameters, quote_via=urllib.parse.quote
@@ -39,6 +40,7 @@ class DecosBase:
                 )
             else:
                 log.error("No response received from Decos")
+            log.error(e)
             raise HTTPExceptions.BAD_GATEWAY.with_content(
                 "We got an error response from Decos"
             )

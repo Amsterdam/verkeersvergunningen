@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 
 import sentry_sdk
@@ -144,3 +145,129 @@ if SENTRY_DSN:
         integrations=[DjangoIntegration()],
         ignore_errors=["ExpiredSignatureError"],
     )
+
+# Django Logging settings
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "root": {
+        "level": "INFO",
+        "handlers": ["console", "sentry"],
+    },
+    "formatters": {
+        "console": {"format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"},
+    },
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "console",
+        },
+        "sentry": {
+            "level": "WARNING",
+            "class": "raven.contrib.django.raven_compat.handlers.SentryHandler",
+        },
+    },
+    "loggers": {
+        "taxi": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "zwaarverkeer": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "health": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "django": {
+            "handlers": ["console"],
+            "level": os.getenv(
+                "DJANGO_LOG_LEVEL", "ERROR" if "pytest" in sys.argv[0] else "INFO"
+            ).upper(),
+            "propagate": False,
+        },
+        "raven": {
+            "level": "DEBUG",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "sentry.errors": {
+            "level": "DEBUG",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        # Debug all batch jobs
+        "doc": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "index": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "search": {
+            "level": "ERROR",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "elasticsearch": {
+            "level": "ERROR",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "urllib3": {
+            "level": "ERROR",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "factory.containers": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "factory.generate": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "requests.packages.urllib3.connectionpool": {
+            "level": "ERROR",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        # Log all unhandled exceptions
+        "django.request": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+    },
+}
+
+APPLICATIONINSIGHTS_CONNECTION_STRING = os.getenv(
+    "APPLICATIONINSIGHTS_CONNECTION_STRING"
+)
+
+if APPLICATIONINSIGHTS_CONNECTION_STRING:
+    OPENCENSUS = {
+        "TRACE": {
+            "SAMPLER": "opencensus.trace.samplers.ProbabilitySampler(rate=1)",
+            "EXPORTER": f"opencensus.ext.azure.trace_exporter.AzureExporter(connection_string='{APPLICATIONINSIGHTS_CONNECTION_STRING}')",
+        }
+    }
+    LOGGING["handlers"]["azure"] = {
+        "level": "DEBUG",
+        "class": "opencensus.ext.azure.log_exporter.AzureLogHandler",
+        "connection_string": APPLICATIONINSIGHTS_CONNECTION_STRING,
+    }
+    LOGGING["loggers"]["django"]["handlers"] = ["azure", "console"]
+    LOGGING["loggers"]["taxi"]["handlers"] = ["azure", "console"]
+    LOGGING["loggers"]["zwaarverkeer"]["handlers"] = ["azure", "console"]
+    LOGGING["loggers"]["health"]["handlers"] = ["azure", "console"]

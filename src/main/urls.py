@@ -32,7 +32,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path("zwaarverkeer/", include("zwaarverkeer.urls")),
     path("taxi/", include("taxi.urls")),
-    path("status/", include("health.urls")),
+    path("", include("health.urls")),
     re_path(
         r"^swagger(?P<format>\.json|\.yaml)$",
         schema_view.without_ui(cache_timeout=0),

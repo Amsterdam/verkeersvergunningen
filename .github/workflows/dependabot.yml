@@ -16,7 +16,7 @@ jobs:
       slack_channel: 'opdrachten-dependabot'  # Slack channel to post release steps to
       timetell_code: 20302  # Timetell project id
       acceptance_pipeline: "https://ci.secure.amsterdam.nl/job/Opdrachten/job/Verkeersvergunningen/job/Verkeersvergunningen/job/main/"
-      production_pipeline: "https://ci.secure.amsterdam.nl/job/Opdrachten/job/Verkeersvergunningen/job/Verkeersvergunningen/view/tags/jobs/<tag>/"
+      production_pipeline: "https://ci.secure.amsterdam.nl/job/Opdrachten/job/Verkeersvergunningen/job/Verkeersvergunningen/view/tags/job/<tag>/"
       acceptance_urls: "https://acc.api.secure.amsterdam.nl/verkeersvergunningen/status/health"
       production_urls: "https://api.secure.amsterdam.nl/verkeersvergunningen/status/health"
 
